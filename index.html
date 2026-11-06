@@ -36,7 +36,7 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <div id="syncStatus" class="hidden mb-4 p-3 bg-purple-50 text-purple-700 text-xs rounded-xl flex items-center space-x-2">
       <i class="fa-solid fa-spinner fa-spin"></i>
-      <span id="syncText">กำลังอัปเดตข้อมูลออนไลน์...</span>
+      <span id="syncText">กำลังซิงค์ข้อมูลกับ Google Sheets...</span>
     </div>
 
     <!-- Controls Bar: View Switcher & Action Button -->
@@ -249,41 +249,40 @@
   <script>
     const API_URL = 'https://script.google.com/macros/s/AKfycbxp-pR9HXs4Ud2YH9gF-gFa7-1CziETgwNd7XAza7Cl1bmdal8Z5CDo86bIf4WCFZvA/exec';
 
-    // โหลดข้อมูลสำรองในเครื่องขึ้นมาก่อนเสมอ เพื่อไม่ให้หน้าเว็บว่างเปล่า
-    let contents = JSON.parse(localStorage.getItem('cafe_contents_backup')) || [];
+    let contents = JSON.parse(localStorage.getItem('cafe_contents_v2')) || [];
     let currentView = 'list';
     let calendarDate = new Date();
 
-    function updateLocalBackup() {
-      localStorage.setItem('cafe_contents_backup', JSON.stringify(contents));
+    function updateUI() {
+      localStorage.setItem('cafe_contents_v2', JSON.stringify(contents));
       updateStats();
       renderContent();
       if(currentView === 'calendar') renderCalendar();
     }
 
     async function loadDataFromCloud() {
-      if(!API_URL || API_URL.includes('วาง_URL')) return;
-      document.getElementById('syncText').innerText = 'กำลังโหลดข้อมูลออนไลน์...';
+      if(!API_URL) return;
+      document.getElementById('syncText').innerText = 'กำลังโหลดข้อมูลล่าสุด...';
       document.getElementById('syncStatus').classList.remove('hidden');
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
-        if(Array.isArray(data) && data.length > 0) {
+        if(Array.isArray(data)) {
           contents = data;
-          updateLocalBackup();
+          updateUI();
         }
       } catch (e) {
-        console.error("Cloud fetch failed, using local backup", e);
+        console.error("Cloud fetch error:", e);
       } finally {
         document.getElementById('syncStatus').classList.add('hidden');
       }
     }
 
     async function saveDataToCloud() {
-      updateLocalBackup();
+      updateUI();
+      if(!API_URL) return;
 
-      if(!API_URL || API_URL.includes('วาง_URL')) return;
-      document.getElementById('syncText').innerText = 'กำลังบันทึกข้อมูลไปยัง Google Sheets...';
+      document.getElementById('syncText').innerText = 'กำลังบันทึกไปยัง Google Sheets...';
       document.getElementById('syncStatus').classList.remove('hidden');
       
       try {
@@ -293,7 +292,7 @@
           body: JSON.stringify(contents)
         });
       } catch (e) {
-        console.error("Cloud save failed", e);
+        console.error("Cloud save error:", e);
       } finally {
         document.getElementById('syncStatus').classList.add('hidden');
       }
@@ -593,8 +592,8 @@
       closeModal();
     }
 
-    // โหลดข้อมูลแสดงผลเบื้องต้นทันที จากนั้นดึงออนไลน์มาอัปเดต
-    updateLocalBackup();
+    // เรียกดึงข้อมูลออนไลน์สดๆ ทันทีที่เปิดหน้าเว็บ
+    updateUI();
     loadDataFromCloud();
   </script>
 </body>
