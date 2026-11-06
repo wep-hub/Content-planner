@@ -54,10 +54,14 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
 
     <!-- Dashboard Stat Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
       <div onclick="setFilterStatus('all')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-300 transition">
         <div class="text-xs text-slate-500 font-medium">ทั้งหมด</div>
         <div id="statAll" class="text-xl font-bold text-slate-800 mt-1">0</div>
+      </div>
+      <div onclick="setFilterStatus('ไอเดีย')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm hover:border-amber-400 transition">
+        <div class="text-xs text-amber-600 font-medium">💡 ไอเดีย</div>
+        <div id="statIdea" class="text-xl font-bold text-amber-600 mt-1">0</div>
       </div>
       <div onclick="setFilterStatus('ยังไม่ถ่าย')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-rose-200 shadow-sm hover:border-rose-400 transition">
         <div class="text-xs text-rose-500 font-medium">🔴 ยังไม่ถ่าย</div>
@@ -71,13 +75,13 @@
         <div class="text-xs text-purple-500 font-medium">🟣 รอตัด</div>
         <div id="statEditing" class="text-xl font-bold text-purple-600 mt-1">0</div>
       </div>
-      <div onclick="setFilterStatus('พร้อมลง')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-amber-200 shadow-sm hover:border-amber-400 transition">
-        <div class="text-xs text-amber-500 font-medium">🟡 พร้อมลง</div>
-        <div id="statReady" class="text-xl font-bold text-amber-600 mt-1">0</div>
+      <div onclick="setFilterStatus('พร้อมลง')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-emerald-200 shadow-sm hover:border-emerald-400 transition">
+        <div class="text-xs text-emerald-500 font-medium">🟡 พร้อมลง</div>
+        <div id="statReady" class="text-xl font-bold text-emerald-600 mt-1">0</div>
       </div>
-      <div onclick="setFilterStatus('ลงแล้ว')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-emerald-200 shadow-sm hover:border-emerald-400 transition">
-        <div class="text-xs text-emerald-500 font-medium">🟢 ลงแล้ว</div>
-        <div id="statPublished" class="text-xl font-bold text-emerald-600 mt-1">0</div>
+      <div onclick="setFilterStatus('ลงแล้ว')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm hover:border-slate-400 transition">
+        <div class="text-xs text-slate-500 font-medium">🟢 ลงแล้ว</div>
+        <div id="statPublished" class="text-xl font-bold text-slate-600 mt-1">0</div>
       </div>
     </div>
 
@@ -101,6 +105,7 @@
 
           <select id="statusFilter" onchange="renderContent()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
             <option value="all">ทุกสถานะ</option>
+            <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ</option>
             <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย</option>
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
             <option value="รอตัด">🟣 รอตัด</option>
@@ -145,6 +150,12 @@
     </div>
   </main>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs sm:text-sm flex items-center space-x-2 opacity-0 transition-opacity duration-300 pointer-events-none z-50">
+    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
+  </div>
+
   <!-- Content Form Modal -->
   <div id="modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -163,12 +174,12 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">📅 วันที่ถ่ายทำ</label>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">📅 วันที่ถ่ายทำ (ระบุหรือไม่ก็ได้)</label>
             <input type="date" id="shootDate" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">🚀 วันที่กำหนดลง</label>
-            <input type="date" id="publishDate" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">🚀 วันที่ลง (เว้นไว้ได้ถ้ายังไม่ลงปฏิทิน)</label>
+            <input type="date" id="publishDate" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
           </div>
         </div>
 
@@ -197,6 +208,7 @@
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">📌 สถานะ</label>
           <select id="status" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ (ยังไม่ระบุวันลง)</option>
             <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย / วางแผน</option>
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
             <option value="รอตัด">🟣 รอตัด / กำลังตัดต่อ</option>
@@ -231,17 +243,32 @@
       },
       {
         id: 2,
-        topic: "บรรยากาศร้านช่วงเช้า แสงสวยถ่ายรูปปัง ☀️",
-        shootDate: "2026-03-03",
-        publishDate: "2026-03-08",
-        platforms: ["Facebook", "TikTok ช่องรอง"],
-        status: "ถ่ายแล้ว",
-        caption: "มุมถ่ายรูปใหม่โซนสวน คาเฟ่เปิด 8.00 น. น้าา"
+        topic: "4 เมนูแนะนำจากเจ้าของร้าน ! ที่ถ้ามาแล้วต้องสั่ง",
+        shootDate: "",
+        publishDate: "",
+        platforms: ["TikTok ช่องหลัก"],
+        status: "ไอเดีย",
+        caption: "คลิปสั้นแนะนำเมนูเด็ดประจำร้าน"
       }
     ];
 
     let currentView = 'list';
     let calendarDate = new Date();
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      toast.classList.remove('opacity-0');
+      setTimeout(() => toast.classList.add('opacity-0'), 2000);
+    }
+
+    function copyTopic(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('คัดลอกหัวข้อแล้ว!');
+      }).catch(err => {
+        console.error('Copy failed', err);
+      });
+    }
 
     function saveToStorage() {
       localStorage.setItem('cafe_contents', JSON.stringify(contents));
@@ -272,6 +299,7 @@
 
     function updateStats() {
       document.getElementById('statAll').innerText = contents.length;
+      document.getElementById('statIdea').innerText = contents.filter(c => c.status === 'ไอเดีย').length;
       document.getElementById('statPlanning').innerText = contents.filter(c => c.status === 'ยังไม่ถ่าย').length;
       document.getElementById('statFilmed').innerText = contents.filter(c => c.status === 'ถ่ายแล้ว').length;
       document.getElementById('statEditing').innerText = contents.filter(c => c.status === 'รอตัด').length;
@@ -291,7 +319,7 @@
       const status = document.getElementById('statusFilter').value;
 
       const filtered = contents.filter(item => {
-        const matchSearch = item.topic.toLowerCase().includes(search) || item.caption.toLowerCase().includes(search);
+        const matchSearch = item.topic.toLowerCase().includes(search) || (item.caption && item.caption.toLowerCase().includes(search));
         const matchPlatform = platform === 'all' || item.platforms.includes(platform);
         const matchStatus = status === 'all' || item.status === status;
         return matchSearch && matchPlatform && matchStatus;
@@ -307,11 +335,12 @@
 
       filtered.forEach(item => {
         const badgeColors = {
+          'ไอเดีย': 'bg-amber-100 text-amber-800 border-amber-300',
           'ยังไม่ถ่าย': 'bg-rose-100 text-rose-700 border-rose-200',
           'ถ่ายแล้ว': 'bg-blue-100 text-blue-700 border-blue-200',
           'รอตัด': 'bg-purple-100 text-purple-700 border-purple-200',
-          'พร้อมลง': 'bg-amber-100 text-amber-700 border-amber-200',
-          'ลงแล้ว': 'bg-emerald-100 text-emerald-700 border-emerald-200'
+          'พร้อมลง': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+          'ลงแล้ว': 'bg-slate-100 text-slate-700 border-slate-200'
         };
 
         const card = document.createElement('div');
@@ -319,13 +348,18 @@
         card.innerHTML = `
           <div>
             <div class="flex justify-between items-start mb-2">
-              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${badgeColors[item.status]}">${item.status}</span>
+              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status === 'ไอเดีย' ? '💡 ไอเดีย' : item.status}</span>
               <div class="flex space-x-1">
                 <button onclick="editContent(${item.id})" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
                 <button onclick="deleteContent(${item.id})" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
               </div>
             </div>
-            <h3 class="font-bold text-slate-800 text-base mb-2">${item.topic}</h3>
+            <div class="flex items-start justify-between group mb-2">
+              <h3 class="font-bold text-slate-800 text-base leading-snug pr-2">${item.topic}</h3>
+              <button onclick="copyTopic(\`${item.topic.replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 bg-slate-50 hover:bg-purple-50 p-1.5 rounded-lg border border-slate-100 transition shrink-0">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
             <p class="text-xs text-slate-500 mb-4 line-clamp-2">${item.caption || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
           </div>
           <div>
@@ -334,7 +368,7 @@
             </div>
             <div class="text-[11px] text-slate-400 pt-3 border-t border-slate-100 flex justify-between">
               <span>📷 ถ่าย: ${item.shootDate || '-'}</span>
-              <span class="font-semibold text-slate-600">🚀 ลง: ${item.publishDate}</span>
+              <span class="font-semibold text-slate-600">🚀 ลง: ${item.publishDate || 'ยังไม่กำหนด'}</span>
             </div>
           </div>
         `;
@@ -361,6 +395,7 @@
 
       for(let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        // แสดงเฉพาะรายการที่มีวันลงที่ตรงกัน
         const dayContents = contents.filter(c => c.publishDate === dateStr);
 
         const dayCell = document.createElement('div');
@@ -406,7 +441,7 @@
       document.getElementById('editId').value = item.id;
       document.getElementById('topic').value = item.topic;
       document.getElementById('shootDate').value = item.shootDate || '';
-      document.getElementById('publishDate').value = item.publishDate;
+      document.getElementById('publishDate').value = item.publishDate || '';
       document.getElementById('status').value = item.status;
       document.getElementById('caption').value = item.caption || '';
 
