@@ -16,34 +16,18 @@
 </head>
 <body class="text-slate-800 min-h-screen pb-12">
 
-  <!-- Main Navbar -->
+  <!-- Main Navbar Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16 sm:h-20">
+      <div class="flex items-center h-16 sm:h-20">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-tr from-purple-600 to-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-200">
             <i class="fa-solid fa-calendar-check text-xl sm:text-2xl"></i>
           </div>
           <div>
             <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">แพลนคอนเทนต์</h1>
-            <p class="text-xs sm:text-sm text-slate-500 font-medium">Sunny Rise Up Café (Online Sync)</p>
+            <p class="text-xs sm:text-sm text-slate-500 font-medium">Sunny Rise Up Café</p>
           </div>
-        </div>
-
-        <div class="flex items-center space-x-2 sm:space-x-3">
-          <div class="bg-slate-100 p-1 rounded-xl flex space-x-1">
-            <button id="btnListView" onclick="switchView('list')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm">
-              <i class="fa-solid fa-list mr-1"></i> รายการ
-            </button>
-            <button id="btnCalendarView" onclick="switchView('calendar')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
-              <i class="fa-solid fa-calendar-days mr-1"></i> ปฏิทิน
-            </button>
-          </div>
-
-          <button onclick="openModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition shadow-md shadow-purple-200 flex items-center space-x-1.5">
-            <i class="fa-solid fa-plus"></i>
-            <span>สร้างแพลน</span>
-          </button>
         </div>
       </div>
     </div>
@@ -52,7 +36,24 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <div id="syncStatus" class="hidden mb-4 p-3 bg-purple-50 text-purple-700 text-xs rounded-xl flex items-center space-x-2">
       <i class="fa-solid fa-spinner fa-spin"></i>
-      <span>กำลังกำลังอัปเดตข้อมูลออนไลน์...</span>
+      <span>กำลังอัปเดตข้อมูลออนไลน์...</span>
+    </div>
+
+    <!-- Controls Bar: View Switcher & Action Button -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="bg-slate-100 p-1 rounded-xl flex space-x-1">
+        <button id="btnListView" onclick="switchView('list')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm">
+          <i class="fa-solid fa-list mr-1.5"></i> รายการ
+        </button>
+        <button id="btnCalendarView" onclick="switchView('calendar')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
+          <i class="fa-solid fa-calendar-days mr-1.5"></i> ปฏิทิน
+        </button>
+      </div>
+
+      <button onclick="openModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition shadow-md shadow-purple-200 flex items-center space-x-1.5">
+        <i class="fa-solid fa-plus"></i>
+        <span>สร้างแพลน</span>
+      </button>
     </div>
 
     <!-- Dashboard Stat Cards -->
@@ -246,7 +247,6 @@
   </div>
 
   <script>
-    // ⚠️ วาง Web App URL จาก Google Apps Script ตรงนี้ครับ
     const API_URL = 'https://script.google.com/macros/s/AKfycbxp-pR9HXs4Ud2YH9gF-gFa7-1CziETgwNd7XAza7Cl1bmdal8Z5CDo86bIf4WCFZvA/exec';
 
     let contents = [];
@@ -312,13 +312,13 @@
       if(view === 'list') {
         listSec.classList.remove('hidden');
         calSec.classList.add('hidden');
-        btnList.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm";
-        btnCal.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900";
+        btnList.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm";
+        btnCal.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900";
       } else {
         listSec.classList.add('hidden');
         calSec.classList.remove('hidden');
-        btnCal.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm";
-        btnList.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900";
+        btnCal.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm";
+        btnList.className = "px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900";
         renderCalendar();
       }
     }
