@@ -420,21 +420,27 @@
       for(let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayContents = contents.filter(c => c.publishDate === dateStr);
+        const hasContent = dayContents.length > 0;
 
         const dayCell = document.createElement('div');
-        dayCell.className = "bg-white min-h-[90px] p-1.5 rounded-lg border border-slate-100 flex flex-col justify-between cursor-pointer hover:border-purple-300 transition";
+        // เพิ่มสไตล์สีเขียวเมื่อวันนั้นมีแพลนต้องทำ
+        dayCell.className = `min-h-[90px] p-1.5 rounded-lg border flex flex-col justify-between cursor-pointer transition ${
+          hasContent 
+            ? 'bg-emerald-50/70 border-emerald-300 hover:border-emerald-500 shadow-sm' 
+            : 'bg-white border-slate-100 hover:border-purple-300'
+        }`;
         dayCell.onclick = () => handleDayClick(dateStr);
 
         let itemsHtml = dayContents.map(c => `
-          <div class="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded truncate font-medium mb-1">
+          <div class="text-[10px] bg-emerald-100/80 text-emerald-800 border border-emerald-300 px-1.5 py-0.5 rounded truncate font-medium mb-1">
             ${c.topic}
           </div>
         `).join('');
 
         dayCell.innerHTML = `
           <div class="flex justify-between items-center text-xs">
-            <span class="font-semibold ${new Date().toISOString().split('T')[0] === dateStr ? 'bg-purple-600 text-white w-5 h-5 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>
-            ${dayContents.length > 0 ? `<span class="bg-purple-100 text-purple-700 text-[10px] font-bold px-1.5 py-0.2 rounded-full">${dayContents.length}</span>` : ''}
+            <span class="font-semibold ${new Date().toISOString().split('T')[0] === dateStr ? 'bg-purple-600 text-white w-5 h-5 rounded-full flex items-center justify-center' : (hasContent ? 'text-emerald-800' : 'text-slate-700')}">${day}</span>
+            ${hasContent ? `<span class="bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full shadow-sm">${dayContents.length}</span>` : ''}
           </div>
           <div class="mt-1 custom-scrollbar overflow-y-auto max-h-[60px]">${itemsHtml}</div>
         `;
