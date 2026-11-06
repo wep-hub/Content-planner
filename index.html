@@ -259,7 +259,7 @@
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
-        contents = data;
+        contents = Array.isArray(data) ? data : [];
         updateStats();
         renderContent();
         if(currentView === 'calendar') renderCalendar();
@@ -277,9 +277,12 @@
 
       if(!API_URL || API_URL.includes('วาง_URL')) return;
       document.getElementById('syncStatus').classList.remove('hidden');
+      
       try {
+        // ใช้ fetch ร่วมกับ text/plain เพื่อป้องกัน CORS Preflight Block จาก Google Apps Script
         await fetch(API_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(contents)
         });
       } catch (e) {
@@ -345,7 +348,7 @@
       const status = document.getElementById('statusFilter').value;
 
       const filtered = contents.filter(item => {
-        const matchSearch = item.topic.toLowerCase().includes(search) || (item.caption && item.caption.toLowerCase().includes(search));
+        const matchSearch = (item.topic || '').toLowerCase().includes(search) || (item.caption && item.caption.toLowerCase().includes(search));
         const matchPlatform = platform === 'all' || (item.platforms && item.platforms.includes(platform));
         const matchStatus = status === 'all' || item.status === status;
         return matchSearch && matchPlatform && matchStatus;
@@ -382,7 +385,7 @@
             </div>
             <div class="flex items-start justify-between group mb-2">
               <h3 class="font-bold text-slate-800 text-base leading-snug pr-2">${item.topic}</h3>
-              <button onclick="copyTopic(\`${item.topic.replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 bg-slate-50 hover:bg-purple-50 p-1.5 rounded-lg border border-slate-100 transition shrink-0">
+              <button onclick="copyTopic(\`${(item.topic || '').replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 bg-slate-50 hover:bg-purple-50 p-1.5 rounded-lg border border-slate-100 transition shrink-0">
                 <i class="fa-regular fa-copy"></i>
               </button>
             </div>
@@ -487,7 +490,7 @@
           <div class="flex justify-between items-start">
             <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status}</span>
             <div class="flex space-x-1">
-              <button onclick="copyTopic(\`${item.topic.replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-regular fa-copy"></i></button>
+              <button onclick="copyTopic(\`${(item.topic || '').replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-regular fa-copy"></i></button>
               <button onclick="closeDayModal(); editContent('${item.id}');" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
             </div>
           </div>
@@ -563,7 +566,9 @@
 
       if(id) {
         const index = contents.findIndex(c => String(c.id) === String(id));
-        contents[index] = { id: String(id), topic, shootDate, publishDate, platforms, status, caption };
+        if(index !== -1) {
+          contents[index] = { id: String(id), topic, shootDate, publishDate, platforms, status, caption };
+        }
       } else {
         const newItem = {
           id: String(Date.now()),
