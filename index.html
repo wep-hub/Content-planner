@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แพลนคอนเทนต์ - Sunny Rise Up Café</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen pb-12">
+
+  <!-- Main Navbar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 sm:h-20">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-tr from-purple-600 to-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-200">
+            <i class="fa-solid fa-calendar-check text-xl sm:text-2xl"></i>
+          </div>
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">แพลนคอนเทนต์</h1>
+            <p class="text-xs sm:text-sm text-slate-500 font-medium">Sunny Rise Up Café</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <!-- View Switcher -->
+          <div class="bg-slate-100 p-1 rounded-xl flex space-x-1">
+            <button id="btnListView" onclick="switchView('list')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm">
+              <i class="fa-solid fa-list mr-1"></i> รายการ
+            </button>
+            <button id="btnCalendarView" onclick="switchView('calendar')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
+              <i class="fa-solid fa-calendar-days mr-1"></i> ปฏิทิน
+            </button>
+          </div>
+
+          <button onclick="openModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition shadow-md shadow-purple-200 flex items-center space-x-1.5">
+            <i class="fa-solid fa-plus"></i>
+            <span>สร้างแพลน</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+
+    <!-- Dashboard Stat Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+      <div onclick="setFilterStatus('all')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-300 transition">
+        <div class="text-xs text-slate-500 font-medium">ทั้งหมด</div>
+        <div id="statAll" class="text-xl font-bold text-slate-800 mt-1">0</div>
+      </div>
+      <div onclick="setFilterStatus('ยังไม่ถ่าย')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-rose-200 shadow-sm hover:border-rose-400 transition">
+        <div class="text-xs text-rose-500 font-medium">🔴 ยังไม่ถ่าย</div>
+        <div id="statPlanning" class="text-xl font-bold text-rose-600 mt-1">0</div>
+      </div>
+      <div onclick="setFilterStatus('ถ่ายแล้ว')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-blue-200 shadow-sm hover:border-blue-400 transition">
+        <div class="text-xs text-blue-500 font-medium">🔵 ถ่ายแล้ว</div>
+        <div id="statFilmed" class="text-xl font-bold text-blue-600 mt-1">0</div>
+      </div>
+      <div onclick="setFilterStatus('รอตัด')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-purple-200 shadow-sm hover:border-purple-400 transition">
+        <div class="text-xs text-purple-500 font-medium">🟣 รอตัด</div>
+        <div id="statEditing" class="text-xl font-bold text-purple-600 mt-1">0</div>
+      </div>
+      <div onclick="setFilterStatus('พร้อมลง')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-amber-200 shadow-sm hover:border-amber-400 transition">
+        <div class="text-xs text-amber-500 font-medium">🟡 พร้อมลง</div>
+        <div id="statReady" class="text-xl font-bold text-amber-600 mt-1">0</div>
+      </div>
+      <div onclick="setFilterStatus('ลงแล้ว')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-emerald-200 shadow-sm hover:border-emerald-400 transition">
+        <div class="text-xs text-emerald-500 font-medium">🟢 ลงแล้ว</div>
+        <div id="statPublished" class="text-xl font-bold text-emerald-600 mt-1">0</div>
+      </div>
+    </div>
+
+    <!-- LIST VIEW SECTION -->
+    <div id="listViewSection">
+      <!-- Search & Filter Controls -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-3 justify-between items-center">
+        <div class="relative w-full md:w-72">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="searchInput" oninput="renderContent()" placeholder="ค้นหาคอนเทนต์..." class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <select id="platformFilter" onchange="renderContent()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="all">ทุกช่องทาง</option>
+            <option value="TikTok ช่องหลัก">TikTok ช่องหลัก</option>
+            <option value="TikTok ช่องรอง">TikTok ช่องรอง</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Instagram">Instagram</option>
+          </select>
+
+          <select id="statusFilter" onchange="renderContent()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="all">ทุกสถานะ</option>
+            <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย</option>
+            <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
+            <option value="รอตัด">🟣 รอตัด</option>
+            <option value="พร้อมลง">🟡 พร้อมลง</option>
+            <option value="ลงแล้ว">🟢 ลงแล้ว</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Content List Cards Grid -->
+      <div id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- JS will populate cards here -->
+      </div>
+    </div>
+
+    <!-- CALENDAR VIEW SECTION -->
+    <div id="calendarViewSection" class="hidden bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="calendarMonthYear" class="text-lg sm:text-xl font-bold text-slate-800"></h2>
+        <div class="flex space-x-2">
+          <button onclick="prevMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm"><i class="fa-solid fa-chevron-left"></i></button>
+          <button onclick="todayMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-medium">เดือนนี้</button>
+          <button onclick="nextMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Calendar Days Header -->
+      <div class="grid grid-cols-7 gap-1 text-center font-semibold text-xs sm:text-sm text-slate-500 mb-2">
+        <div class="text-rose-500">อา.</div>
+        <div>จ.</div>
+        <div>อ.</div>
+        <div>พ.</div>
+        <div>พฤ.</div>
+        <div>ศ.</div>
+        <div class="text-indigo-500">ส.</div>
+      </div>
+
+      <!-- Calendar Days Grid -->
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1 bg-slate-100 p-1 rounded-xl">
+        <!-- JS will populate grid here -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Content Form Modal -->
+  <div id="modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex justify-between items-center mb-5">
+        <h3 id="modalTitle" class="text-lg font-bold text-slate-800">สร้างแพลนคอนเทนต์</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <form id="contentForm" onsubmit="saveContent(event)" class="space-y-4">
+        <input type="hidden" id="editId">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">หัวข้อ / เรื่องคอนเทนต์</label>
+          <input type="text" id="topic" required placeholder="ลงข้อมูล" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">📅 วันที่ถ่ายทำ</label>
+            <input type="date" id="shootDate" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">🚀 วันที่กำหนดลง</label>
+            <input type="date" id="publishDate" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">📢 ช่องทางการลง (เลือกได้หลายช่องทาง)</label>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <label class="flex items-center space-x-2 border border-slate-200 p-2 rounded-xl cursor-pointer hover:bg-slate-50">
+              <input type="checkbox" name="platform" value="TikTok ช่องหลัก" class="accent-purple-600">
+              <span>🎵 TikTok ช่องหลัก</span>
+            </label>
+            <label class="flex items-center space-x-2 border border-slate-200 p-2 rounded-xl cursor-pointer hover:bg-slate-50">
+              <input type="checkbox" name="platform" value="TikTok ช่องรอง" class="accent-purple-600">
+              <span>🎵 TikTok ช่องรอง</span>
+            </label>
+            <label class="flex items-center space-x-2 border border-slate-200 p-2 rounded-xl cursor-pointer hover:bg-slate-50">
+              <input type="checkbox" name="platform" value="Facebook" class="accent-purple-600">
+              <span>📘 Facebook</span>
+            </label>
+            <label class="flex items-center space-x-2 border border-slate-200 p-2 rounded-xl cursor-pointer hover:bg-slate-50">
+              <input type="checkbox" name="platform" value="Instagram" class="accent-purple-600">
+              <span>📸 Instagram</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">📌 สถานะ</label>
+          <select id="status" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย / วางแผน</option>
+            <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
+            <option value="รอตัด">🟣 รอตัด / กำลังตัดต่อ</option>
+            <option value="พร้อมลง">🟡 พร้อมลง</option>
+            <option value="ลงแล้ว">🟢 ลงแล้ว</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">📝 แคปชั่น / รายละเอียดเพิ่มเติม</label>
+          <textarea id="caption" rows="3" placeholder="เขียนแคปชั่น แฮชแท็ก หรือบรีฟการถ่ายทำที่นี่..." class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-3">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50">ยกเลิก</button>
+          <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-medium shadow-md shadow-purple-200">บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let contents = JSON.parse(localStorage.getItem('cafe_contents')) || [
+      {
+        id: 1,
+        topic: "เมนูใหม่ Matcha Coconut Latte 🥥🍵",
+        shootDate: "2026-03-01",
+        publishDate: "2026-03-05",
+        platforms: ["TikTok ช่องหลัก", "Instagram"],
+        status: "พร้อมลง",
+        caption: "ต้อนรับซัมเมอร์ด้วยความหอมสดชื่น! ชาเขียวพรีเมียมผสมน้ำมะพร้าวสด #SunnyRiseUpCafe"
+      },
+      {
+        id: 2,
+        topic: "บรรยากาศร้านช่วงเช้า แสงสวยถ่ายรูปปัง ☀️",
+        shootDate: "2026-03-03",
+        publishDate: "2026-03-08",
+        platforms: ["Facebook", "TikTok ช่องรอง"],
+        status: "ถ่ายแล้ว",
+        caption: "มุมถ่ายรูปใหม่โซนสวน คาเฟ่เปิด 8.00 น. น้าา"
+      }
+    ];
+
+    let currentView = 'list';
+    let calendarDate = new Date();
+
+    function saveToStorage() {
+      localStorage.setItem('cafe_contents', JSON.stringify(contents));
+      updateStats();
+      renderContent();
+    }
+
+    function switchView(view) {
+      currentView = view;
+      const listSec = document.getElementById('listViewSection');
+      const calSec = document.getElementById('calendarViewSection');
+      const btnList = document.getElementById('btnListView');
+      const btnCal = document.getElementById('btnCalendarView');
+
+      if(view === 'list') {
+        listSec.classList.remove('hidden');
+        calSec.classList.add('hidden');
+        btnList.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm";
+        btnCal.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900";
+      } else {
+        listSec.classList.add('hidden');
+        calSec.classList.remove('hidden');
+        btnCal.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm";
+        btnList.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all text-slate-600 hover:text-slate-900";
+        renderCalendar();
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('statAll').innerText = contents.length;
+      document.getElementById('statPlanning').innerText = contents.filter(c => c.status === 'ยังไม่ถ่าย').length;
+      document.getElementById('statFilmed').innerText = contents.filter(c => c.status === 'ถ่ายแล้ว').length;
+      document.getElementById('statEditing').innerText = contents.filter(c => c.status === 'รอตัด').length;
+      document.getElementById('statReady').innerText = contents.filter(c => c.status === 'พร้อมลง').length;
+      document.getElementById('statPublished').innerText = contents.filter(c => c.status === 'ลงแล้ว').length;
+    }
+
+    function setFilterStatus(status) {
+      document.getElementById('statusFilter').value = status;
+      if(currentView !== 'list') switchView('list');
+      renderContent();
+    }
+
+    function renderContent() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const platform = document.getElementById('platformFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      const filtered = contents.filter(item => {
+        const matchSearch = item.topic.toLowerCase().includes(search) || item.caption.toLowerCase().includes(search);
+        const matchPlatform = platform === 'all' || item.platforms.includes(platform);
+        const matchStatus = status === 'all' || item.status === status;
+        return matchSearch && matchPlatform && matchStatus;
+      });
+
+      const grid = document.getElementById('contentGrid');
+      grid.innerHTML = '';
+
+      if(filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">ไม่พบรายการคอนเทนต์</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const badgeColors = {
+          'ยังไม่ถ่าย': 'bg-rose-100 text-rose-700 border-rose-200',
+          'ถ่ายแล้ว': 'bg-blue-100 text-blue-700 border-blue-200',
+          'รอตัด': 'bg-purple-100 text-purple-700 border-purple-200',
+          'พร้อมลง': 'bg-amber-100 text-amber-700 border-amber-200',
+          'ลงแล้ว': 'bg-emerald-100 text-emerald-700 border-emerald-200'
+        };
+
+        const card = document.createElement('div');
+        card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${badgeColors[item.status]}">${item.status}</span>
+              <div class="flex space-x-1">
+                <button onclick="editContent(${item.id})" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="deleteContent(${item.id})" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
+              </div>
+            </div>
+            <h3 class="font-bold text-slate-800 text-base mb-2">${item.topic}</h3>
+            <p class="text-xs text-slate-500 mb-4 line-clamp-2">${item.caption || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
+          </div>
+          <div>
+            <div class="flex flex-wrap gap-1.5 mb-3">
+              ${item.platforms.map(p => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
+            </div>
+            <div class="text-[11px] text-slate-400 pt-3 border-t border-slate-100 flex justify-between">
+              <span>📷 ถ่าย: ${item.shootDate || '-'}</span>
+              <span class="font-semibold text-slate-600">🚀 ลง: ${item.publishDate}</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+
+      const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year + 543}`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for(let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      for(let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayContents = contents.filter(c => c.publishDate === dateStr);
+
+        const dayCell = document.createElement('div');
+        dayCell.className = "bg-white min-h-[90px] p-1.5 rounded-lg border border-slate-100 flex flex-col justify-between";
+        
+        let itemsHtml = dayContents.map(c => `
+          <div onclick="editContent(${c.id})" class="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded cursor-pointer truncate font-medium mb-1">
+            ${c.topic}
+          </div>
+        `).join('');
+
+        dayCell.innerHTML = `
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold ${new Date().toISOString().split('T')[0] === dateStr ? 'bg-purple-600 text-white w-5 h-5 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>
+            <button onclick="openModal('${dateStr}')" class="text-slate-300 hover:text-purple-600 text-[10px]"><i class="fa-solid fa-plus"></i></button>
+          </div>
+          <div class="mt-1 custom-scrollbar overflow-y-auto max-h-[60px]">${itemsHtml}</div>
+        `;
+        grid.appendChild(dayCell);
+      }
+    }
+
+    function prevMonth() { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }
+    function nextMonth() { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); }
+    function todayMonth() { calendarDate = new Date(); renderCalendar(); }
+
+    function openModal(defaultDate = '') {
+      document.getElementById('contentForm').reset();
+      document.getElementById('editId').value = '';
+      document.getElementById('modalTitle').innerText = 'สร้างแพลนคอนเทนต์';
+      if(defaultDate) document.getElementById('publishDate').value = defaultDate;
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function editContent(id) {
+      const item = contents.find(c => c.id === id);
+      if(!item) return;
+
+      document.getElementById('editId').value = item.id;
+      document.getElementById('topic').value = item.topic;
+      document.getElementById('shootDate').value = item.shootDate || '';
+      document.getElementById('publishDate').value = item.publishDate;
+      document.getElementById('status').value = item.status;
+      document.getElementById('caption').value = item.caption || '';
+
+      const checkboxes = document.querySelectorAll('input[name="platform"]');
+      checkboxes.forEach(cb => {
+        cb.checked = item.platforms.includes(cb.value);
+      });
+
+      document.getElementById('modalTitle').innerText = 'แก้ไขแพลนคอนเทนต์';
+      document.getElementById('modal').classList.remove('hidden');
+    }
+
+    function deleteContent(id) {
+      if(confirm('คุณต้องการลบแพลนคอนเทนต์นี้ใช่หรือไม่?')) {
+        contents = contents.filter(c => c.id !== id);
+        saveToStorage();
+        if(currentView === 'calendar') renderCalendar();
+      }
+    }
+
+    function saveContent(e) {
+      e.preventDefault();
+      const id = document.getElementById('editId').value;
+      const topic = document.getElementById('topic').value;
+      const shootDate = document.getElementById('shootDate').value;
+      const publishDate = document.getElementById('publishDate').value;
+      const status = document.getElementById('status').value;
+      const caption = document.getElementById('caption').value;
+
+      const platforms = Array.from(document.querySelectorAll('input[name="platform"]:checked')).map(cb => cb.value);
+
+      if(id) {
+        const index = contents.findIndex(c => c.id == id);
+        contents[index] = { id: Number(id), topic, shootDate, publishDate, platforms, status, caption };
+      } else {
+        const newItem = {
+          id: Date.now(),
+          topic,
+          shootDate,
+          publishDate,
+          platforms,
+          status,
+          caption
+        };
+        contents.unshift(newItem);
+      }
+
+      saveToStorage();
+      if(currentView === 'calendar') renderCalendar();
+      closeModal();
+    }
+
+    // Init
+    updateStats();
+    renderContent();
+  </script>
+</body>
+</html>
