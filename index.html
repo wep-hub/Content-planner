@@ -247,11 +247,23 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxKRa4Y1KvOJWusT1SgO8T0zTFO7UWDWce237QBoxKl8p1EuP2BTv6mmatZVRP2wTu7/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxp-pR9HXs4Ud2YH9gF-gFa7-1CziETgwNd7XAza7Cl1bmdal8Z5CDo86bIf4WCFZvA/exec';
 
     let contents = JSON.parse(localStorage.getItem('cafe_contents_v2')) || [];
     let currentView = 'list';
     let calendarDate = new Date();
+
+    function formatDate(dateStr) {
+      if (!dateStr || dateStr === '-') return '-';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    }
 
     function updateUI() {
       localStorage.setItem('cafe_contents_v2', JSON.stringify(contents));
@@ -401,9 +413,9 @@
             <div class="flex flex-wrap gap-1.5 mb-3">
               ${(item.platforms || []).map(p => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
             </div>
-            <div class="text-[11px] text-slate-400 pt-3 border-t border-slate-100 flex justify-between">
-              <span>📷 ถ่าย: ${item.shootDate || '-'}</span>
-              <span class="font-semibold text-slate-600">🚀 ลง: ${item.publishDate || 'ยังไม่กำหนด'}</span>
+            <div class="text-xs sm:text-sm text-slate-600 pt-3 border-t border-slate-100 flex justify-between items-center">
+              <span>📷 ถ่าย: <strong class="font-semibold text-slate-700">${formatDate(item.shootDate)}</strong></span>
+              <span>🚀 ลง: <strong class="font-bold text-purple-700">${formatDate(item.publishDate)}</strong></span>
             </div>
           </div>
         `;
@@ -430,7 +442,7 @@
 
       for(let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayContents = contents.filter(c => c.publishDate === dateStr);
+        const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr);
         const hasContent = dayContents.length > 0;
 
         const dayCell = document.createElement('div');
@@ -459,7 +471,7 @@
     }
 
     function handleDayClick(dateStr) {
-      const dayContents = contents.filter(c => c.publishDate === dateStr);
+      const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr);
       if (dayContents.length > 0) {
         openDayModal(dateStr, dayContents);
       } else {
@@ -538,8 +550,8 @@
 
       document.getElementById('editId').value = item.id;
       document.getElementById('topic').value = item.topic;
-      document.getElementById('shootDate').value = item.shootDate || '';
-      document.getElementById('publishDate').value = item.publishDate || '';
+      document.getElementById('shootDate').value = formatDate(item.shootDate) !== '-' ? formatDate(item.shootDate) : '';
+      document.getElementById('publishDate').value = formatDate(item.publishDate) !== '-' ? formatDate(item.publishDate) : '';
       document.getElementById('status').value = item.status;
       document.getElementById('caption').value = item.caption || '';
 
@@ -592,7 +604,6 @@
       closeModal();
     }
 
-    // เรียกดึงข้อมูลออนไลน์สดๆ ทันทีที่เปิดหน้าเว็บ
     updateUI();
     loadDataFromCloud();
   </script>
