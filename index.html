@@ -26,12 +26,11 @@
           </div>
           <div>
             <h1 class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">แพลนคอนเทนต์</h1>
-            <p class="text-xs sm:text-sm text-slate-500 font-medium">Sunny Rise Up Café</p>
+            <p class="text-xs sm:text-sm text-slate-500 font-medium">Sunny Rise Up Café (Online Sync)</p>
           </div>
         </div>
 
         <div class="flex items-center space-x-2 sm:space-x-3">
-          <!-- View Switcher -->
           <div class="bg-slate-100 p-1 rounded-xl flex space-x-1">
             <button id="btnListView" onclick="switchView('list')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm">
               <i class="fa-solid fa-list mr-1"></i> รายการ
@@ -50,8 +49,11 @@
     </div>
   </header>
 
-  <!-- Main Content Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <div id="syncStatus" class="hidden mb-4 p-3 bg-purple-50 text-purple-700 text-xs rounded-xl flex items-center space-x-2">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <span>กำลังกำลังอัปเดตข้อมูลออนไลน์...</span>
+    </div>
 
     <!-- Dashboard Stat Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
@@ -87,7 +89,6 @@
 
     <!-- LIST VIEW SECTION -->
     <div id="listViewSection">
-      <!-- Search & Filter Controls -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-3 justify-between items-center">
         <div class="relative w-full md:w-72">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -115,10 +116,7 @@
         </div>
       </div>
 
-      <!-- Content List Cards Grid -->
-      <div id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- JS will populate cards here -->
-      </div>
+      <div id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
 
     <!-- CALENDAR VIEW SECTION -->
@@ -132,7 +130,6 @@
         </div>
       </div>
 
-      <!-- Calendar Days Header -->
       <div class="grid grid-cols-7 gap-1 text-center font-semibold text-xs sm:text-sm text-slate-500 mb-2">
         <div class="text-rose-500">อา.</div>
         <div>จ.</div>
@@ -143,20 +140,16 @@
         <div class="text-indigo-500">ส.</div>
       </div>
 
-      <!-- Calendar Days Grid -->
-      <div id="calendarGrid" class="grid grid-cols-7 gap-1 bg-slate-100 p-1 rounded-xl">
-        <!-- JS will populate grid here -->
-      </div>
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1 bg-slate-100 p-1 rounded-xl"></div>
     </div>
   </main>
 
-  <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs sm:text-sm flex items-center space-x-2 opacity-0 transition-opacity duration-300 pointer-events-none z-50">
     <i class="fa-solid fa-circle-check text-emerald-400"></i>
     <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
   </div>
 
-  <!-- Day View Modal (เปิดดูคอนเทนต์ประจำวัน) -->
+  <!-- Day View Modal -->
   <div id="dayModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
@@ -167,9 +160,7 @@
         <button onclick="closeDayModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
 
-      <div id="dayModalList" class="space-y-3 flex-1 overflow-y-auto">
-        <!-- รายการของวันนั้นจะมาโชว์ตรงนี้ -->
-      </div>
+      <div id="dayModalList" class="space-y-3 flex-1 overflow-y-auto"></div>
 
       <div class="pt-4 mt-2 border-t border-slate-100 flex justify-between items-center">
         <button id="dayModalAddBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center space-x-1.5 shadow-md shadow-purple-200">
@@ -255,29 +246,48 @@
   </div>
 
   <script>
-    let contents = JSON.parse(localStorage.getItem('cafe_contents')) || [
-      {
-        id: 1,
-        topic: "เมนูใหม่ Matcha Coconut Latte 🥥🍵",
-        shootDate: "2026-03-01",
-        publishDate: "2026-03-05",
-        platforms: ["TikTok ช่องหลัก", "Instagram"],
-        status: "พร้อมลง",
-        caption: "ต้อนรับซัมเมอร์ด้วยความหอมสดชื่น! ชาเขียวพรีเมียมผสมน้ำมะพร้าวสด #SunnyRiseUpCafe"
-      },
-      {
-        id: 2,
-        topic: "4 เมนูแนะนำจากเจ้าของร้าน ! ที่ถ้ามาแล้วต้องสั่ง",
-        shootDate: "",
-        publishDate: "",
-        platforms: ["TikTok ช่องหลัก"],
-        status: "ไอเดีย",
-        caption: "คลิปสั้นแนะนำเมนูเด็ดประจำร้าน"
-      }
-    ];
+    // ⚠️ วาง Web App URL จาก Google Apps Script ตรงนี้ครับ
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxp-pR9HXs4Ud2YH9gF-gFa7-1CziETgwNd7XAza7Cl1bmdal8Z5CDo86bIf4WCFZvA/exec';
 
+    let contents = [];
     let currentView = 'list';
     let calendarDate = new Date();
+
+    async function loadDataFromCloud() {
+      if(!API_URL || API_URL.includes('วาง_URL')) return;
+      document.getElementById('syncStatus').classList.remove('hidden');
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        contents = data;
+        updateStats();
+        renderContent();
+        if(currentView === 'calendar') renderCalendar();
+      } catch (e) {
+        console.error("Cloud fetch failed", e);
+      } finally {
+        document.getElementById('syncStatus').classList.add('hidden');
+      }
+    }
+
+    async function saveDataToCloud() {
+      updateStats();
+      renderContent();
+      if(currentView === 'calendar') renderCalendar();
+
+      if(!API_URL || API_URL.includes('วาง_URL')) return;
+      document.getElementById('syncStatus').classList.remove('hidden');
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(contents)
+        });
+      } catch (e) {
+        console.error("Cloud save failed", e);
+      } finally {
+        document.getElementById('syncStatus').classList.add('hidden');
+      }
+    }
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
@@ -289,15 +299,7 @@
     function copyTopic(text) {
       navigator.clipboard.writeText(text).then(() => {
         showToast('คัดลอกหัวข้อแล้ว!');
-      }).catch(err => {
-        console.error('Copy failed', err);
       });
-    }
-
-    function saveToStorage() {
-      localStorage.setItem('cafe_contents', JSON.stringify(contents));
-      updateStats();
-      renderContent();
     }
 
     function switchView(view) {
@@ -344,7 +346,7 @@
 
       const filtered = contents.filter(item => {
         const matchSearch = item.topic.toLowerCase().includes(search) || (item.caption && item.caption.toLowerCase().includes(search));
-        const matchPlatform = platform === 'all' || item.platforms.includes(platform);
+        const matchPlatform = platform === 'all' || (item.platforms && item.platforms.includes(platform));
         const matchStatus = status === 'all' || item.status === status;
         return matchSearch && matchPlatform && matchStatus;
       });
@@ -374,8 +376,8 @@
             <div class="flex justify-between items-start mb-2">
               <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status === 'ไอเดีย' ? '💡 ไอเดีย' : item.status}</span>
               <div class="flex space-x-1">
-                <button onclick="editContent(${item.id})" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
-                <button onclick="deleteContent(${item.id})" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                <button onclick="editContent('${item.id}')" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="deleteContent('${item.id}')" class="text-slate-400 hover:text-rose-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
               </div>
             </div>
             <div class="flex items-start justify-between group mb-2">
@@ -388,7 +390,7 @@
           </div>
           <div>
             <div class="flex flex-wrap gap-1.5 mb-3">
-              ${item.platforms.map(p => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
+              ${(item.platforms || []).map(p => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
             </div>
             <div class="text-[11px] text-slate-400 pt-3 border-t border-slate-100 flex justify-between">
               <span>📷 ถ่าย: ${item.shootDate || '-'}</span>
@@ -423,7 +425,6 @@
         const hasContent = dayContents.length > 0;
 
         const dayCell = document.createElement('div');
-        // เพิ่มสไตล์สีเขียวเมื่อวันนั้นมีแพลนต้องทำ
         dayCell.className = `min-h-[90px] p-1.5 rounded-lg border flex flex-col justify-between cursor-pointer transition ${
           hasContent 
             ? 'bg-emerald-50/70 border-emerald-300 hover:border-emerald-500 shadow-sm' 
@@ -487,13 +488,13 @@
             <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status}</span>
             <div class="flex space-x-1">
               <button onclick="copyTopic(\`${item.topic.replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-regular fa-copy"></i></button>
-              <button onclick="closeDayModal(); editContent(${item.id});" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="closeDayModal(); editContent('${item.id}');" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
             </div>
           </div>
           <h4 class="font-bold text-slate-800 text-sm leading-snug">${item.topic}</h4>
           ${item.caption ? `<p class="text-xs text-slate-500 line-clamp-2">${item.caption}</p>` : ''}
           <div class="flex flex-wrap gap-1 pt-1">
-            ${item.platforms.map(p => `<span class="bg-white border border-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
+            ${(item.platforms || []).map(p => `<span class="bg-white border border-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
           </div>
         `;
         listContainer.appendChild(itemEl);
@@ -523,7 +524,7 @@
     }
 
     function editContent(id) {
-      const item = contents.find(c => c.id === id);
+      const item = contents.find(c => String(c.id) === String(id));
       if(!item) return;
 
       document.getElementById('editId').value = item.id;
@@ -535,7 +536,7 @@
 
       const checkboxes = document.querySelectorAll('input[name="platform"]');
       checkboxes.forEach(cb => {
-        cb.checked = item.platforms.includes(cb.value);
+        cb.checked = (item.platforms || []).includes(cb.value);
       });
 
       document.getElementById('modalTitle').innerText = 'แก้ไขแพลนคอนเทนต์';
@@ -544,9 +545,8 @@
 
     function deleteContent(id) {
       if(confirm('คุณต้องการลบแพลนคอนเทนต์นี้ใช่หรือไม่?')) {
-        contents = contents.filter(c => c.id !== id);
-        saveToStorage();
-        if(currentView === 'calendar') renderCalendar();
+        contents = contents.filter(c => String(c.id) !== String(id));
+        saveDataToCloud();
       }
     }
 
@@ -562,11 +562,11 @@
       const platforms = Array.from(document.querySelectorAll('input[name="platform"]:checked')).map(cb => cb.value);
 
       if(id) {
-        const index = contents.findIndex(c => c.id == id);
-        contents[index] = { id: Number(id), topic, shootDate, publishDate, platforms, status, caption };
+        const index = contents.findIndex(c => String(c.id) === String(id));
+        contents[index] = { id: String(id), topic, shootDate, publishDate, platforms, status, caption };
       } else {
         const newItem = {
-          id: Date.now(),
+          id: String(Date.now()),
           topic,
           shootDate,
           publishDate,
@@ -577,14 +577,12 @@
         contents.unshift(newItem);
       }
 
-      saveToStorage();
-      if(currentView === 'calendar') renderCalendar();
+      saveDataToCloud();
       closeModal();
     }
 
-    // Init
-    updateStats();
-    renderContent();
+    // Init Data
+    loadDataFromCloud();
   </script>
 </body>
 </html>
