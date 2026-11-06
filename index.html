@@ -54,34 +54,34 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
 
     <!-- Dashboard Stat Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
-      <div onclick="setFilterStatus('all')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-300 transition">
-        <div class="text-xs text-slate-500 font-medium">ทั้งหมด</div>
-        <div id="statAll" class="text-xl font-bold text-slate-800 mt-1">0</div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
+      <div onclick="setFilterStatus('all')" class="cursor-pointer bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-300 transition">
+        <div class="text-[11px] text-slate-500 font-medium">ทั้งหมด</div>
+        <div id="statAll" class="text-lg font-bold text-slate-800 mt-0.5">0</div>
       </div>
-      <div onclick="setFilterStatus('ไอเดีย')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm hover:border-amber-400 transition">
-        <div class="text-xs text-amber-600 font-medium">💡 ไอเดีย</div>
-        <div id="statIdea" class="text-xl font-bold text-amber-600 mt-1">0</div>
+      <div onclick="setFilterStatus('ไอเดีย')" class="cursor-pointer bg-white p-3 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm hover:border-amber-400 transition">
+        <div class="text-[11px] text-amber-600 font-medium">💡 ไอเดีย</div>
+        <div id="statIdea" class="text-lg font-bold text-amber-600 mt-0.5">0</div>
       </div>
-      <div onclick="setFilterStatus('ยังไม่ถ่าย')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-rose-200 shadow-sm hover:border-rose-400 transition">
-        <div class="text-xs text-rose-500 font-medium">🔴 ยังไม่ถ่าย</div>
-        <div id="statPlanning" class="text-xl font-bold text-rose-600 mt-1">0</div>
+      <div onclick="setFilterStatus('ยังไม่ถ่าย')" class="cursor-pointer bg-white p-3 rounded-2xl border border-rose-200 shadow-sm hover:border-rose-400 transition">
+        <div class="text-[11px] text-rose-500 font-medium">🔴 ยังไม่ถ่าย</div>
+        <div id="statPlanning" class="text-lg font-bold text-rose-600 mt-0.5">0</div>
       </div>
-      <div onclick="setFilterStatus('ถ่ายแล้ว')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-blue-200 shadow-sm hover:border-blue-400 transition">
-        <div class="text-xs text-blue-500 font-medium">🔵 ถ่ายแล้ว</div>
-        <div id="statFilmed" class="text-xl font-bold text-blue-600 mt-1">0</div>
+      <div onclick="setFilterStatus('ถ่ายแล้ว')" class="cursor-pointer bg-white p-3 rounded-2xl border border-blue-200 shadow-sm hover:border-blue-400 transition">
+        <div class="text-[11px] text-blue-500 font-medium">🔵 ถ่ายแล้ว</div>
+        <div id="statFilmed" class="text-lg font-bold text-blue-600 mt-0.5">0</div>
       </div>
-      <div onclick="setFilterStatus('รอตัด')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-purple-200 shadow-sm hover:border-purple-400 transition">
-        <div class="text-xs text-purple-500 font-medium">🟣 รอตัด</div>
-        <div id="statEditing" class="text-xl font-bold text-purple-600 mt-1">0</div>
+      <div onclick="setFilterStatus('รอตัด')" class="cursor-pointer bg-white p-3 rounded-2xl border border-purple-200 shadow-sm hover:border-purple-400 transition">
+        <div class="text-[11px] text-purple-500 font-medium">🟣 รอตัด</div>
+        <div id="statEditing" class="text-lg font-bold text-purple-600 mt-0.5">0</div>
       </div>
-      <div onclick="setFilterStatus('พร้อมลง')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-emerald-200 shadow-sm hover:border-emerald-400 transition">
-        <div class="text-xs text-emerald-500 font-medium">🟡 พร้อมลง</div>
-        <div id="statReady" class="text-xl font-bold text-emerald-600 mt-1">0</div>
+      <div onclick="setFilterStatus('พร้อมลง')" class="cursor-pointer bg-white p-3 rounded-2xl border border-emerald-200 shadow-sm hover:border-emerald-400 transition">
+        <div class="text-[11px] text-emerald-500 font-medium">🟡 พร้อมลง</div>
+        <div id="statReady" class="text-lg font-bold text-emerald-600 mt-0.5">0</div>
       </div>
-      <div onclick="setFilterStatus('ลงแล้ว')" class="cursor-pointer bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm hover:border-slate-400 transition">
-        <div class="text-xs text-slate-500 font-medium">🟢 ลงแล้ว</div>
-        <div id="statPublished" class="text-xl font-bold text-slate-600 mt-1">0</div>
+      <div onclick="setFilterStatus('ลงแล้ว')" class="cursor-pointer bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:border-slate-400 transition">
+        <div class="text-[11px] text-slate-500 font-medium">🟢 ลงแล้ว</div>
+        <div id="statPublished" class="text-lg font-bold text-slate-600 mt-0.5">0</div>
       </div>
     </div>
 
@@ -156,6 +156,30 @@
     <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
   </div>
 
+  <!-- Day View Modal (เปิดดูคอนเทนต์ประจำวัน) -->
+  <div id="dayModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h3 id="dayModalTitle" class="text-base font-bold text-slate-800">แพลนคอนเทนต์</h3>
+          <p id="dayModalSub" class="text-xs text-slate-400 font-normal"></p>
+        </div>
+        <button onclick="closeDayModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <div id="dayModalList" class="space-y-3 flex-1 overflow-y-auto">
+        <!-- รายการของวันนั้นจะมาโชว์ตรงนี้ -->
+      </div>
+
+      <div class="pt-4 mt-2 border-t border-slate-100 flex justify-between items-center">
+        <button id="dayModalAddBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center space-x-1.5 shadow-md shadow-purple-200">
+          <i class="fa-solid fa-plus"></i>
+          <span>เพิ่มแพลนในวันนี้</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Content Form Modal -->
   <div id="modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -172,7 +196,6 @@
           <input type="text" id="topic" required placeholder="ลงข้อมูล" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
         </div>
 
-        <!-- ปรับแต่งส่วนวันที่ แยกบรรทัดกันในมือถืออย่างชัดเจนไม่ทับกัน -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">📅 วันที่ถ่ายทำ <span class="text-slate-400 font-normal">(ระบุหรือไม่ก็ได้)</span></label>
@@ -399,10 +422,11 @@
         const dayContents = contents.filter(c => c.publishDate === dateStr);
 
         const dayCell = document.createElement('div');
-        dayCell.className = "bg-white min-h-[90px] p-1.5 rounded-lg border border-slate-100 flex flex-col justify-between";
-        
+        dayCell.className = "bg-white min-h-[90px] p-1.5 rounded-lg border border-slate-100 flex flex-col justify-between cursor-pointer hover:border-purple-300 transition";
+        dayCell.onclick = () => handleDayClick(dateStr);
+
         let itemsHtml = dayContents.map(c => `
-          <div onclick="editContent(${c.id})" class="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded cursor-pointer truncate font-medium mb-1">
+          <div class="text-[10px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded truncate font-medium mb-1">
             ${c.topic}
           </div>
         `).join('');
@@ -410,12 +434,70 @@
         dayCell.innerHTML = `
           <div class="flex justify-between items-center text-xs">
             <span class="font-semibold ${new Date().toISOString().split('T')[0] === dateStr ? 'bg-purple-600 text-white w-5 h-5 rounded-full flex items-center justify-center' : 'text-slate-700'}">${day}</span>
-            <button onclick="openModal('${dateStr}')" class="text-slate-300 hover:text-purple-600 text-[10px]"><i class="fa-solid fa-plus"></i></button>
+            ${dayContents.length > 0 ? `<span class="bg-purple-100 text-purple-700 text-[10px] font-bold px-1.5 py-0.2 rounded-full">${dayContents.length}</span>` : ''}
           </div>
           <div class="mt-1 custom-scrollbar overflow-y-auto max-h-[60px]">${itemsHtml}</div>
         `;
         grid.appendChild(dayCell);
       }
+    }
+
+    function handleDayClick(dateStr) {
+      const dayContents = contents.filter(c => c.publishDate === dateStr);
+      if (dayContents.length > 0) {
+        openDayModal(dateStr, dayContents);
+      } else {
+        openModal(dateStr);
+      }
+    }
+
+    function openDayModal(dateStr, dayContents) {
+      const [y, m, d] = dateStr.split('-');
+      const formattedDate = `ประจำวันที่ ${Number(d)}/${Number(m)}/${Number(y) + 543}`;
+      
+      document.getElementById('dayModalSub').innerText = formattedDate;
+      document.getElementById('dayModalAddBtn').onclick = () => {
+        closeDayModal();
+        openModal(dateStr);
+      };
+
+      const listContainer = document.getElementById('dayModalList');
+      listContainer.innerHTML = '';
+
+      const badgeColors = {
+        'ไอเดีย': 'bg-amber-100 text-amber-800 border-amber-300',
+        'ยังไม่ถ่าย': 'bg-rose-100 text-rose-700 border-rose-200',
+        'ถ่ายแล้ว': 'bg-blue-100 text-blue-700 border-blue-200',
+        'รอตัด': 'bg-purple-100 text-purple-700 border-purple-200',
+        'พร้อมลง': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        'ลงแล้ว': 'bg-slate-100 text-slate-700 border-slate-200'
+      };
+
+      dayContents.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-2";
+        itemEl.innerHTML = `
+          <div class="flex justify-between items-start">
+            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status}</span>
+            <div class="flex space-x-1">
+              <button onclick="copyTopic(\`${item.topic.replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-regular fa-copy"></i></button>
+              <button onclick="closeDayModal(); editContent(${item.id});" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+            </div>
+          </div>
+          <h4 class="font-bold text-slate-800 text-sm leading-snug">${item.topic}</h4>
+          ${item.caption ? `<p class="text-xs text-slate-500 line-clamp-2">${item.caption}</p>` : ''}
+          <div class="flex flex-wrap gap-1 pt-1">
+            ${item.platforms.map(p => `<span class="bg-white border border-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
+          </div>
+        `;
+        listContainer.appendChild(itemEl);
+      });
+
+      document.getElementById('dayModal').classList.remove('hidden');
+    }
+
+    function closeDayModal() {
+      document.getElementById('dayModal').classList.add('hidden');
     }
 
     function prevMonth() { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }
