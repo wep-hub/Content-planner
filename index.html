@@ -185,7 +185,7 @@
         <div id="calendarGrid" class="grid grid-cols-7 gap-1 bg-slate-100 p-1 rounded-xl"></div>
       </div>
 
-      <!-- VISUAL SUMMARY SECTION (สรุปภาพรวมปฏิทินแบบแบ่งสัปดาห์) -->
+      <!-- VISUAL SUMMARY SECTION -->
       <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex justify-between items-center pb-3 border-b border-slate-100">
           <div class="flex items-center space-x-2">
@@ -195,7 +195,6 @@
           <span id="monthlyTotalBadge" class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">รวม 0 คอนเทนต์</span>
         </div>
 
-        <!-- การ์ดสรุปแยก 4 สัปดาห์ -->
         <div id="weeklySummaryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
       </div>
     </div>
@@ -354,9 +353,12 @@
       renderContent();
     }
 
+    // สรุปแพลน 7 วันส่ง LINE โดยจัดเรียงจากวันที่ใกล้ที่สุดไปหาอนาคต
     function copyWeeklySummary() {
       const today = new Date();
-      const nextWeek = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const nextWeek = new Date(today);
       nextWeek.setDate(today.getDate() + 7);
 
       const weekContents = contents.filter(c => {
@@ -369,6 +371,9 @@
         showToast('ไม่มีแพลนคอนเทนต์ใน 7 วันข้างหน้า');
         return;
       }
+
+      // เรียงลำดับวันที่จากใกล้สุด -> ไกลสุด (Ascending Order)
+      weekContents.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
 
       let summaryText = `📋 สรุปแพลนคอนเทนต์ 7 วันข้างหน้า\nSunny Rise Up Café\n-------------------------\n`;
       weekContents.forEach(item => {
@@ -655,11 +660,9 @@
         grid.appendChild(dayCell);
       }
 
-      // สร้าง Visual Summary รายสัปดาห์
       renderWeeklySummary(daysInMonth, year, month);
     }
 
-    // ฟังก์ชันสร้างการ์ดสรุปแบ่ง 4 สัปดาห์ (แนวทางที่ 2)
     function renderWeeklySummary(daysInMonth, year, month) {
       const summaryGrid = document.getElementById('weeklySummaryGrid');
       summaryGrid.innerHTML = '';
@@ -677,6 +680,9 @@
           const d = new Date(c.publishDate);
           return d.getFullYear() === year && d.getMonth() === month && d.getDate() >= w.start && d.getDate() <= w.end;
         });
+
+        // เรียงลำดับตามวันที่ในสัปดาห์
+        weekItems.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
 
         const weekCard = document.createElement('div');
         weekCard.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex flex-col justify-between";
