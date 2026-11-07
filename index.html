@@ -129,7 +129,7 @@
         </div>
       </div>
 
-      <!-- แถบปุ่มสรุปไอเดีย (จะแสดงเมื่อเลือกดูสถานะไอเดีย) -->
+      <!-- แถบปุ่มสรุปไอเดีย -->
       <div id="ideaActionHeader" class="hidden mb-4 flex justify-between items-center bg-amber-50 p-3 rounded-2xl border border-amber-200">
         <div class="flex items-center space-x-2 text-amber-800 text-xs sm:text-sm font-semibold">
           <i class="fa-solid fa-lightbulb text-amber-500 text-base"></i>
@@ -145,43 +145,59 @@
     </div>
 
     <!-- CALENDAR VIEW SECTION -->
-    <div id="calendarViewSection" class="hidden bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
-      <div class="mb-4 pb-4 border-b border-slate-100 flex flex-wrap gap-2 text-xs">
-        <span class="font-semibold text-slate-500 self-center mr-1">สถิติแพลตฟอร์มเดือนนี้:</span>
-        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-medium">🟢 TikTok หลัก: <strong id="countTtMain">0</strong></span>
-        <span class="bg-pink-50 text-pink-700 border border-pink-200 px-2.5 py-1 rounded-lg font-medium">🩷 TikTok รอง: <strong id="countTtSub">0</strong></span>
-        <span class="bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-lg font-medium">🔵 Facebook: <strong id="countFb">0</strong></span>
-        <span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg font-medium">🟣 Instagram: <strong id="countIg">0</strong></span>
-      </div>
-
-      <div class="mb-4 flex flex-wrap items-center gap-3 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-        <span class="font-medium text-slate-700">สัญลักษณ์สีช่องทาง:</span>
-        <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>TikTok หลัก (เขียว)</span></span>
-        <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span><span>TikTok รอง (ชมพู)</span></span>
-        <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span><span>Facebook (ฟ้า)</span></span>
-        <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span><span>Instagram (ม่วง)</span></span>
-      </div>
-
-      <div class="flex justify-between items-center mb-6">
-        <h2 id="calendarMonthYear" class="text-lg sm:text-xl font-bold text-slate-800"></h2>
-        <div class="flex space-x-2">
-          <button onclick="prevMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm"><i class="fa-solid fa-chevron-left"></i></button>
-          <button onclick="todayMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-medium">เดือนนี้</button>
-          <button onclick="nextMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm"><i class="fa-solid fa-chevron-right"></i></button>
+    <div id="calendarViewSection" class="hidden space-y-6">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="mb-4 pb-4 border-b border-slate-100 flex flex-wrap gap-2 text-xs">
+          <span class="font-semibold text-slate-500 self-center mr-1">สถิติแพลตฟอร์มเดือนนี้:</span>
+          <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-medium">🟢 TikTok หลัก: <strong id="countTtMain">0</strong></span>
+          <span class="bg-pink-50 text-pink-700 border border-pink-200 px-2.5 py-1 rounded-lg font-medium">🩷 TikTok รอง: <strong id="countTtSub">0</strong></span>
+          <span class="bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-lg font-medium">🔵 Facebook: <strong id="countFb">0</strong></span>
+          <span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg font-medium">🟣 Instagram: <strong id="countIg">0</strong></span>
         </div>
+
+        <div class="mb-4 flex flex-wrap items-center gap-3 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+          <span class="font-medium text-slate-700">สัญลักษณ์สีช่องทาง:</span>
+          <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>TikTok หลัก (เขียว)</span></span>
+          <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span><span>TikTok รอง (ชมพู)</span></span>
+          <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span><span>Facebook (ฟ้า)</span></span>
+          <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span><span>Instagram (ม่วง)</span></span>
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+          <h2 id="calendarMonthYear" class="text-lg sm:text-xl font-bold text-slate-800"></h2>
+          <div class="flex space-x-2">
+            <button onclick="prevMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm"><i class="fa-solid fa-chevron-left"></i></button>
+            <button onclick="todayMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm font-medium">เดือนนี้</button>
+            <button onclick="nextMonth()" class="px-3 py-1.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-sm"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-7 gap-1 text-center font-semibold text-xs sm:text-sm text-slate-500 mb-2">
+          <div class="text-rose-500">อา.</div>
+          <div>จ.</div>
+          <div>อ.</div>
+          <div>พ.</div>
+          <div>พฤ.</div>
+          <div>ศ.</div>
+          <div class="text-indigo-500">ส.</div>
+        </div>
+
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1 bg-slate-100 p-1 rounded-xl"></div>
       </div>
 
-      <div class="grid grid-cols-7 gap-1 text-center font-semibold text-xs sm:text-sm text-slate-500 mb-2">
-        <div class="text-rose-500">อา.</div>
-        <div>จ.</div>
-        <div>อ.</div>
-        <div>พ.</div>
-        <div>พฤ.</div>
-        <div>ศ.</div>
-        <div class="text-indigo-500">ส.</div>
-      </div>
+      <!-- VISUAL SUMMARY SECTION (สรุปภาพรวมปฏิทินแบบแบ่งสัปดาห์) -->
+      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-chart-pie text-purple-600 text-lg"></i>
+            <h3 class="font-bold text-slate-800 text-base">สรุปภาพรวมปฏิทินประจำเดือน</h3>
+          </div>
+          <span id="monthlyTotalBadge" class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">รวม 0 คอนเทนต์</span>
+        </div>
 
-      <div id="calendarGrid" class="grid grid-cols-7 gap-1 bg-slate-100 p-1 rounded-xl"></div>
+        <!-- การ์ดสรุปแยก 4 สัปดาห์ -->
+        <div id="weeklySummaryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+      </div>
     </div>
   </main>
 
@@ -482,7 +498,6 @@
       const platform = document.getElementById('platformFilter').value;
       const status = document.getElementById('statusFilter').value;
 
-      // ตรวจสอบว่ากำลังเลือกดู "ไอเดีย" หรือไม่ เพื่อซ่อน/แสดงปุ่ม "สรุปไอเดีย"
       const ideaHeader = document.getElementById('ideaActionHeader');
       if (status === 'ไอเดีย') {
         ideaHeader.classList.remove('hidden');
@@ -559,10 +574,13 @@
       document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year + 543}`;
 
       let countTtMain = 0, countTtSub = 0, countFb = 0, countIg = 0;
+      let monthContentsList = [];
+
       contents.forEach(c => {
         if(!c.publishDate) return;
         const d = new Date(c.publishDate);
         if(d.getFullYear() === year && d.getMonth() === month) {
+          monthContentsList.push(c);
           (c.platforms || []).forEach(p => {
             if(p === 'TikTok ช่องหลัก') countTtMain++;
             if(p === 'TikTok ช่องรอง') countTtSub++;
@@ -571,10 +589,12 @@
           });
         }
       });
+
       document.getElementById('countTtMain').innerText = countTtMain;
       document.getElementById('countTtSub').innerText = countTtSub;
       document.getElementById('countFb').innerText = countFb;
       document.getElementById('countIg').innerText = countIg;
+      document.getElementById('monthlyTotalBadge').innerText = `รวม ${monthContentsList.length} คอนเทนต์`;
 
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -634,6 +654,71 @@
         `;
         grid.appendChild(dayCell);
       }
+
+      // สร้าง Visual Summary รายสัปดาห์
+      renderWeeklySummary(daysInMonth, year, month);
+    }
+
+    // ฟังก์ชันสร้างการ์ดสรุปแบ่ง 4 สัปดาห์ (แนวทางที่ 2)
+    function renderWeeklySummary(daysInMonth, year, month) {
+      const summaryGrid = document.getElementById('weeklySummaryGrid');
+      summaryGrid.innerHTML = '';
+
+      const weeks = [
+        { title: "สัปดาห์ที่ 1 (วันที่ 1 - 7)", start: 1, end: 7 },
+        { title: "สัปดาห์ที่ 2 (วันที่ 8 - 14)", start: 8, end: 14 },
+        { title: "สัปดาห์ที่ 3 (วันที่ 15 - 21)", start: 15, end: 21 },
+        { title: "สัปดาห์ที่ 4 (วันที่ 22 - 31)", start: 22, end: daysInMonth }
+      ];
+
+      weeks.forEach(w => {
+        const weekItems = contents.filter(c => {
+          if(!c.publishDate) return false;
+          const d = new Date(c.publishDate);
+          return d.getFullYear() === year && d.getMonth() === month && d.getDate() >= w.start && d.getDate() <= w.end;
+        });
+
+        const weekCard = document.createElement('div');
+        weekCard.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex flex-col justify-between";
+
+        let contentListHtml = '';
+        if(weekItems.length === 0) {
+          contentListHtml = `<p class="text-xs text-slate-400 italic py-2 text-center">ไม่มีแพลนสัปดาห์นี้</p>`;
+        } else {
+          contentListHtml = weekItems.map(item => {
+            const dateDay = new Date(item.publishDate).getDate();
+            const platformTags = (item.platforms || []).map(p => {
+              let dotColor = "bg-slate-400";
+              if (p === 'TikTok ช่องหลัก') dotColor = "bg-emerald-500";
+              if (p === 'TikTok ช่องรอง') dotColor = "bg-pink-500";
+              if (p === 'Facebook') dotColor = "bg-sky-500";
+              if (p === 'Instagram') dotColor = "bg-purple-500";
+              return `<span class="inline-block w-2 h-2 rounded-full ${dotColor} mr-1" title="${p}"></span>`;
+            }).join('');
+
+            return `
+              <div class="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs text-xs space-y-1">
+                <div class="flex items-center justify-between font-semibold text-slate-700">
+                  <span class="text-purple-600 text-[11px]">วันที่ ${dateDay}</span>
+                  <div>${platformTags}</div>
+                </div>
+                <div class="font-medium text-slate-800 truncate">${item.topic}</div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        weekCard.innerHTML = `
+          <div>
+            <div class="flex justify-between items-center mb-2.5">
+              <h4 class="font-bold text-xs text-slate-700">${w.title}</h4>
+              <span class="bg-white text-slate-600 border border-slate-200 text-[10px] font-bold px-2 py-0.5 rounded-md">${weekItems.length} คลิป</span>
+            </div>
+            <div class="space-y-1.5 custom-scrollbar max-h-44 overflow-y-auto pr-0.5">${contentListHtml}</div>
+          </div>
+        `;
+        summaryGrid.appendChild(weekCard);
+      });
     }
 
     function handleDayClick(dateStr) {
