@@ -15,14 +15,11 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     
-    /* สไตล์สำหรับการ Export PDF โดยเฉพาะเพื่อแก้ปัญหาอิโมจิทับซ้อน */
-    #pdfReportTemplate {
-      font-family: 'Kanit', sans-serif !important;
-      line-height: 1.6 !important;
-    }
-    #pdfReportTemplate td, #pdfReportTemplate th {
-      line-height: 1.6 !important;
-      word-break: break-word !important;
+    /* สไตล์การเว้นระยะเฉพาะหน้าสร้าง PDF */
+    .pdf-cell {
+      padding: 12px 10px !important;
+      line-height: 1.8 !important;
+      vertical-align: middle !important;
     }
   </style>
 </head>
@@ -223,11 +220,11 @@
     <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
   </div>
 
-  <!-- Hidden Container สำหรับ Render รายงาน PDF สวยงาม (ปรับแต่งบรรทัดให้พอดี ไม่ทับอิโมจิ) -->
-  <div id="pdfReportTemplate" class="hidden bg-white p-8 text-slate-800 leading-relaxed">
+  <!-- Hidden Container สำหรับ Render รายงาน PDF สวยงาม (แก้ปัญหา Emoji ทับซ้อน) -->
+  <div id="pdfReportTemplate" class="hidden bg-white p-8 text-slate-800">
     <div class="border-b-2 border-purple-600 pb-4 mb-6 flex justify-between items-end">
       <div>
-        <h1 class="text-2xl font-bold text-purple-700 pt-2">รายงานสรุปภาพรวมคอนเทนต์ประจำเดือน</h1>
+        <h1 class="text-2xl font-bold text-purple-700">รายงานสรุปภาพรวมคอนเทนต์ประจำเดือน</h1>
         <p class="text-sm text-slate-500 font-medium">Sunny Rise Up Café</p>
       </div>
       <div class="text-right">
@@ -272,10 +269,10 @@
       <table class="w-full text-xs text-left border-collapse border border-slate-200">
         <thead>
           <tr class="bg-slate-100 text-slate-700">
-            <th class="border border-slate-200 p-2.5 w-24">วันที่ลง</th>
-            <th class="border border-slate-200 p-2.5">หัวข้อคอนเทนต์</th>
-            <th class="border border-slate-200 p-2.5 w-32">ช่องทาง</th>
-            <th class="border border-slate-200 p-2.5 w-24">สถานะ</th>
+            <th class="border border-slate-200 pdf-cell w-24">วันที่ลง</th>
+            <th class="border border-slate-200 pdf-cell">หัวข้อคอนเทนต์</th>
+            <th class="border border-slate-200 pdf-cell w-32">ช่องทาง</th>
+            <th class="border border-slate-200 pdf-cell w-24">สถานะ</th>
           </tr>
         </thead>
         <tbody id="pdfTableBody"></tbody>
@@ -483,7 +480,13 @@
       return status === 'ลงแล้ว' || status === '🟢 ลงแล้ว';
     }
 
-    // ฟังก์ชันสร้างภาพสรุปรายงาน PDF ของเดือนที่ดูอยู่ (ปรับแต่งขอบและการเว้นวรรค)
+    // ฟังก์ชันช่วยลบ Emoji ออกเฉพาะสำหรับตาราง PDF เพื่อไม่ให้ทับกับภาษาไทย
+    function removeEmojis(text) {
+      if(!text) return '';
+      return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').trim();
+    }
+
+    // ฟังก์ชันสร้างรายงาน PDF ที่แก้ปัญหาเรื่อง Emoji และบรรทัดทับกัน
     function exportMonthlyPDF() {
       const year = calendarDate.getFullYear();
       const month = calendarDate.getMonth();
@@ -533,13 +536,14 @@
         tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่มีรายการคอนเทนต์ในเดือนนี้</td></tr>`;
       } else {
         monthContents.forEach(item => {
+          const cleanTopic = removeEmojis(item.topic);
           const tr = document.createElement('tr');
           tr.className = "border-b border-slate-200";
           tr.innerHTML = `
-            <td class="p-2.5 border border-slate-200 font-medium">${formatDate(item.publishDate)}</td>
-            <td class="p-2.5 border border-slate-200 font-semibold text-slate-800 leading-normal">${item.topic}</td>
-            <td class="p-2.5 border border-slate-200">${(item.platforms || []).join(', ')}</td>
-            <td class="p-2.5 border border-slate-200 font-medium">${item.status}</td>
+            <td class="border border-slate-200 pdf-cell font-medium">${formatDate(item.publishDate)}</td>
+            <td class="border border-slate-200 pdf-cell font-semibold text-slate-800">${cleanTopic}</td>
+            <td class="border border-slate-200 pdf-cell">${(item.platforms || []).join(', ')}</td>
+            <td class="border border-slate-200 pdf-cell font-medium">${item.status}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -549,10 +553,10 @@
       element.classList.remove('hidden');
 
       const opt = {
-        margin:       0.4,
+        margin:       [0.4, 0.4, 0.4, 0.4],
         filename:     `Content-Plan-${monthNames[month]}-${year+543}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
