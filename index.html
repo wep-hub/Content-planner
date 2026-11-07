@@ -30,11 +30,21 @@
           </div>
         </div>
 
-        <button onclick="copyWeeklySummary()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
-          <i class="fa-brands fa-line text-base text-emerald-600"></i>
-          <span class="hidden sm:inline">คัดลอกแพลนส่ง LINE</span>
-          <span class="sm:hidden">สรุปส่งไลน์</span>
-        </button>
+        <div class="flex items-center space-x-2">
+          <!-- ปุ่มสรุปคลังไอเดียส่ง LINE -->
+          <button onclick="copyIdeaSummary()" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
+            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+            <span class="hidden sm:inline">สรุปไอเดียส่ง LINE</span>
+            <span class="sm:hidden">สรุปไอเดีย</span>
+          </button>
+
+          <!-- ปุ่มสรุปแพลนส่ง LINE -->
+          <button onclick="copyWeeklySummary()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
+            <i class="fa-brands fa-line text-base text-emerald-600"></i>
+            <span class="hidden sm:inline">คัดลอกแพลนส่ง LINE</span>
+            <span class="sm:hidden">สรุปส่งไลน์</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -175,7 +185,7 @@
     <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
   </div>
 
-  <!-- Day View Modal (หน้าต่างประจำวัน) -->
+  <!-- Day View Modal -->
   <div id="dayModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
@@ -188,7 +198,6 @@
 
       <div id="dayModalList" class="space-y-3 flex-1 overflow-y-auto"></div>
 
-      <!-- ปุ่มดำเนินการประจำวัน -->
       <div class="pt-4 mt-2 border-t border-slate-100 flex flex-col space-y-2">
         <button id="dayModalPickIdeaBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center space-x-1.5 shadow-md shadow-amber-200">
           <i class="fa-solid fa-lightbulb"></i>
@@ -202,7 +211,7 @@
     </div>
   </div>
 
-  <!-- Idea Picker Modal (หน้าต่างดึงไอเดียคลัง) -->
+  <!-- Idea Picker Modal -->
   <div id="ideaPickerModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl max-h-[80vh] overflow-y-auto custom-scrollbar flex flex-col">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
@@ -324,6 +333,7 @@
       renderContent();
     }
 
+    // สรุปแพลน 7 วันส่ง LINE แบบฟอร์แมตเรียบหรูตามขอ
     function copyWeeklySummary() {
       const today = new Date();
       const nextWeek = new Date();
@@ -340,13 +350,32 @@
         return;
       }
 
-      let summaryText = `📋 **สรุปแพลนคอนเทนต์ 7 วันข้างหน้า**\n☕ Sunny Rise Up Café\n-------------------------\n`;
+      let summaryText = `📋 สรุปแพลนคอนเทนต์ 7 วันข้างหน้า\nSunny Rise Up Café\n-------------------------\n`;
       weekContents.forEach(item => {
-        summaryText += `🚀 วันที่ลง: ${formatDate(item.publishDate)}\n📌 เรื่อง: ${item.topic}\n📢 ช่องทาง: ${(item.platforms || []).join(', ')}\n📊 สถานะ: ${item.status}\n\n`;
+        summaryText += `🗓️ วันที่ลง : ${formatDate(item.publishDate)}\n• เรื่อง : ${item.topic}\n• ช่องทาง : ${(item.platforms || []).join(', ')}\n• สถานะ : ${item.status}\n\n`;
       });
 
       navigator.clipboard.writeText(summaryText).then(() => {
-        showToast('คัดลอกแพลนส่ง LINE เรียบร้อยแล้ว!');
+        showToast('คัดลอกแพลนส่ง LINE เรียบร้อย!');
+      });
+    }
+
+    // สรุปคลังไอเดียทั้งหมดส่ง LINE
+    function copyIdeaSummary() {
+      const ideaContents = contents.filter(c => c.status === 'ไอเดีย' || !c.publishDate || c.publishDate === '-' || c.publishDate === '');
+
+      if(ideaContents.length === 0) {
+        showToast('ไม่มีไอเดียค้างอยู่เลย');
+        return;
+      }
+
+      let summaryText = `💡 สรุปคลังไอเดียคอนเทนต์ (รอลงปฏิทิน)\nSunny Rise Up Café\n-------------------------\n`;
+      ideaContents.forEach((item, index) => {
+        summaryText += `${index + 1}. เรื่อง : ${item.topic}\n• ช่องทาง : ${(item.platforms || []).join(', ') || 'ยังไม่ระบุ'}\n• รายละเอียด : ${item.caption || 'ไม่มีรายละเอียด'}\n\n`;
+      });
+
+      navigator.clipboard.writeText(summaryText).then(() => {
+        showToast('คัดลอกสรุปไอเดียส่ง LINE เรียบร้อย!');
       });
     }
 
@@ -608,7 +637,6 @@
       
       document.getElementById('dayModalSub').innerText = formattedDate;
       
-      // ตั้งค่าปุ่มใน Modal
       document.getElementById('dayModalAddBtn').onclick = () => {
         closeDayModal();
         openModal(dateStr);
@@ -661,13 +689,11 @@
       document.getElementById('dayModal').classList.add('hidden');
     }
 
-    // เปิด Modal เลือกดึงไอเดียที่ค้างอยู่
     function openIdeaPickerModal(targetDateStr) {
       selectedDateForPick = targetDateStr;
       const [y, m, d] = targetDateStr.split('-');
       document.getElementById('ideaPickerSub').innerText = `เลือกคอนเทนต์มาลงวันที่ ${Number(d)}/${Number(m)}/${Number(y) + 543}`;
 
-      // กรองเอาคอนเทนต์ที่เป็น "ไอเดีย" หรือยังไม่ได้ระบุวันลง
       const unassignedItems = contents.filter(c => c.status === 'ไอเดีย' || !c.publishDate || c.publishDate === '-' || c.publishDate === '');
 
       const listEl = document.getElementById('ideaPickerList');
@@ -700,12 +726,10 @@
       document.getElementById('ideaPickerModal').classList.add('hidden');
     }
 
-    // กำหนดวันลงให้คอนเทนต์ไอเดีย
     function assignIdeaToDate(itemId, targetDateStr) {
       const index = contents.findIndex(c => String(c.id) === String(itemId));
       if (index !== -1) {
         contents[index].publishDate = targetDateStr;
-        // ถ้าสถานะเดิมเป็น "ไอเดีย" ปรับเป็น "ยังไม่ถ่าย" เพื่อให้พร้อมลุยต่อ
         if (contents[index].status === 'ไอเดีย') {
           contents[index].status = 'ยังไม่ถ่าย';
         }
