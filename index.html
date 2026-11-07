@@ -31,13 +31,6 @@
         </div>
 
         <div class="flex items-center space-x-2">
-          <!-- ปุ่มสรุปคลังไอเดียส่ง LINE -->
-          <button onclick="copyIdeaSummary()" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
-            <i class="fa-solid fa-lightbulb text-amber-500"></i>
-            <span class="hidden sm:inline">สรุปไอเดียส่ง LINE</span>
-            <span class="sm:hidden">สรุปไอเดีย</span>
-          </button>
-
           <!-- ปุ่มสรุปแพลนส่ง LINE -->
           <button onclick="copyWeeklySummary()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
             <i class="fa-brands fa-line text-base text-emerald-600"></i>
@@ -134,6 +127,18 @@
             <option value="ลงแล้ว">🟢 ลงแล้ว</option>
           </select>
         </div>
+      </div>
+
+      <!-- แถบปุ่มสรุปไอเดีย (จะแสดงเมื่อเลือกดูสถานะไอเดีย) -->
+      <div id="ideaActionHeader" class="hidden mb-4 flex justify-between items-center bg-amber-50 p-3 rounded-2xl border border-amber-200">
+        <div class="flex items-center space-x-2 text-amber-800 text-xs sm:text-sm font-semibold">
+          <i class="fa-solid fa-lightbulb text-amber-500 text-base"></i>
+          <span>คลังไอเดียทั้งหมด (รอลงปฏิทิน)</span>
+        </div>
+        <button onclick="copyIdeaSummary()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
+          <i class="fa-solid fa-copy"></i>
+          <span>สรุปไอเดีย</span>
+        </button>
       </div>
 
       <div id="contentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -333,7 +338,6 @@
       renderContent();
     }
 
-    // สรุปแพลน 7 วันส่ง LINE แบบฟอร์แมตเรียบหรูตามขอ
     function copyWeeklySummary() {
       const today = new Date();
       const nextWeek = new Date();
@@ -360,7 +364,6 @@
       });
     }
 
-    // สรุปคลังไอเดียทั้งหมดส่ง LINE
     function copyIdeaSummary() {
       const ideaContents = contents.filter(c => c.status === 'ไอเดีย' || !c.publishDate || c.publishDate === '-' || c.publishDate === '');
 
@@ -478,6 +481,14 @@
       const search = document.getElementById('searchInput').value.toLowerCase();
       const platform = document.getElementById('platformFilter').value;
       const status = document.getElementById('statusFilter').value;
+
+      // ตรวจสอบว่ากำลังเลือกดู "ไอเดีย" หรือไม่ เพื่อซ่อน/แสดงปุ่ม "สรุปไอเดีย"
+      const ideaHeader = document.getElementById('ideaActionHeader');
+      if (status === 'ไอเดีย') {
+        ideaHeader.classList.remove('hidden');
+      } else {
+        ideaHeader.classList.add('hidden');
+      }
 
       const filtered = contents.filter(item => {
         const matchSearch = (item.topic || '').toLowerCase().includes(search) || (item.caption && item.caption.toLowerCase().includes(search));
