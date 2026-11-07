@@ -30,7 +30,6 @@
           </div>
         </div>
 
-        <!-- ปุ่มสรุปแพลนส่งไลน์ (ฟีเจอร์ข้อ 3) -->
         <button onclick="copyWeeklySummary()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
           <i class="fa-brands fa-line text-base text-emerald-600"></i>
           <span class="hidden sm:inline">คัดลอกแพลนส่ง LINE</span>
@@ -46,7 +45,7 @@
       <span id="syncText">กำลังซิงค์ข้อมูลกับ Google Sheets...</span>
     </div>
 
-    <!-- Controls Bar: View Switcher & Action Button -->
+    <!-- Controls Bar -->
     <div class="flex justify-between items-center mb-6">
       <div class="bg-slate-100 p-1 rounded-xl flex space-x-1">
         <button id="btnListView" onclick="switchView('list')" class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all bg-white text-purple-600 shadow-sm">
@@ -98,7 +97,6 @@
     <!-- LIST VIEW SECTION -->
     <div id="listViewSection">
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-3 justify-between items-center">
-        <!-- ช่องค้นหาพร้อมปุ่ม X ล้างข้อมูล (ฟีเจอร์ข้อ 3) -->
         <div class="relative w-full md:w-72">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
           <input type="text" id="searchInput" oninput="toggleClearBtn(); renderContent();" placeholder="ค้นหาคอนเทนต์..." class="w-full pl-9 pr-8 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -133,7 +131,6 @@
 
     <!-- CALENDAR VIEW SECTION -->
     <div id="calendarViewSection" class="hidden bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
-      <!-- สถิติจำนวนคลิปแยกตามแพลตฟอร์ม (ฟีเจอร์ข้อ 1) -->
       <div class="mb-4 pb-4 border-b border-slate-100 flex flex-wrap gap-2 text-xs">
         <span class="font-semibold text-slate-500 self-center mr-1">สถิติแพลตฟอร์มเดือนนี้:</span>
         <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-medium">🟢 TikTok หลัก: <strong id="countTtMain">0</strong></span>
@@ -142,7 +139,6 @@
         <span class="bg-purple-50 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-lg font-medium">🟣 Instagram: <strong id="countIg">0</strong></span>
       </div>
 
-      <!-- คำอธิบายสัญลักษณ์สีบนปฏิทิน -->
       <div class="mb-4 flex flex-wrap items-center gap-3 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
         <span class="font-medium text-slate-700">สัญลักษณ์สีช่องทาง:</span>
         <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>TikTok หลัก (เขียว)</span></span>
@@ -501,7 +497,6 @@
       const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year + 543}`;
 
-      // คำนวณสถิติแพลตฟอร์มรายเดือน (ฟีเจอร์ข้อ 1)
       let countTtMain = 0, countTtSub = 0, countFb = 0, countIg = 0;
       contents.forEach(c => {
         if(!c.publishDate) return;
@@ -532,15 +527,27 @@
         const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr);
         const hasContent = dayContents.length > 0;
 
+        // คำนวณสีพื้นหลังและสีเส้นกรอบของช่องวัน ตามแพลตฟอร์มหลัก
+        let cardColorStyle = "bg-white border-slate-100 hover:border-purple-300";
+        if (hasContent) {
+          const allPlatforms = dayContents.flatMap(c => c.platforms || []);
+          if (allPlatforms.includes('TikTok ช่องหลัก')) {
+            cardColorStyle = "bg-emerald-50/50 border-emerald-300 hover:border-emerald-500 shadow-sm";
+          } else if (allPlatforms.includes('TikTok ช่องรอง')) {
+            cardColorStyle = "bg-pink-50/50 border-pink-300 hover:border-pink-500 shadow-sm";
+          } else if (allPlatforms.includes('Facebook')) {
+            cardColorStyle = "bg-sky-50/50 border-sky-300 hover:border-sky-500 shadow-sm";
+          } else if (allPlatforms.includes('Instagram')) {
+            cardColorStyle = "bg-purple-50/50 border-purple-300 hover:border-purple-500 shadow-sm";
+          } else {
+            cardColorStyle = "bg-purple-50/50 border-purple-200 hover:border-purple-400 shadow-sm";
+          }
+        }
+
         const dayCell = document.createElement('div');
-        dayCell.className = `min-h-[95px] p-1.5 rounded-lg border flex flex-col justify-between cursor-pointer transition ${
-          hasContent 
-            ? 'bg-purple-50/40 border-purple-200 hover:border-purple-400 shadow-sm' 
-            : 'bg-white border-slate-100 hover:border-purple-300'
-        }`;
+        dayCell.className = `min-h-[95px] p-1.5 rounded-2xl border flex flex-col justify-between cursor-pointer transition ${cardColorStyle}`;
         dayCell.onclick = () => handleDayClick(dateStr);
 
-        // กำหนดสีแท็กแพลตฟอร์มบนปฏิทิน
         let itemsHtml = '';
         dayContents.forEach(c => {
           (c.platforms || ['ทั่วไป']).forEach(plat => {
@@ -551,7 +558,7 @@
             if (plat === 'Instagram') colorStyle = "bg-purple-100 text-purple-800 border-purple-300 font-semibold";
 
             itemsHtml += `
-              <div class="text-[10px] ${colorStyle} border px-1.5 py-0.5 rounded truncate mb-1" title="${c.topic} (${plat})">
+              <div class="text-[10px] ${colorStyle} border px-1.5 py-0.5 rounded-lg truncate mb-1" title="${c.topic} (${plat})">
                 ${c.topic}
               </div>
             `;
