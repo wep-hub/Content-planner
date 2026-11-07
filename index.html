@@ -353,7 +353,6 @@
       renderContent();
     }
 
-    // สรุปแพลน 7 วันส่ง LINE โดยจัดเรียงจากวันที่ใกล้ที่สุดไปหาอนาคต
     function copyWeeklySummary() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -372,7 +371,6 @@
         return;
       }
 
-      // เรียงลำดับวันที่จากใกล้สุด -> ไกลสุด (Ascending Order)
       weekContents.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
 
       let summaryText = `📋 สรุปแพลนคอนเทนต์ 7 วันข้างหน้า\nSunny Rise Up Café\n-------------------------\n`;
@@ -526,6 +524,7 @@
       }
 
       filtered.forEach(item => {
+        // แท็กสถานะ
         const badgeColors = {
           'ไอเดีย': 'bg-amber-100 text-amber-800 border-amber-300',
           'ยังไม่ถ่าย': 'bg-rose-100 text-rose-700 border-rose-200',
@@ -535,8 +534,20 @@
           'ลงแล้ว': 'bg-slate-100 text-slate-700 border-slate-200'
         };
 
+        // สีกรอบและพื้นหลังของการ์ดแยกตามสถานะ
+        const cardBgColors = {
+          'ไอเดีย': 'bg-amber-50/60 border-amber-300 hover:border-amber-400',
+          'ยังไม่ถ่าย': 'bg-rose-50/60 border-rose-300 hover:border-rose-400',
+          'ถ่ายแล้ว': 'bg-blue-50/60 border-blue-300 hover:border-blue-400',
+          'รอตัด': 'bg-purple-50/60 border-purple-300 hover:border-purple-400',
+          'พร้อมลง': 'bg-emerald-50/60 border-emerald-300 hover:border-emerald-400',
+          'ลงแล้ว': 'bg-slate-100/60 border-slate-300 hover:border-slate-400'
+        };
+
+        const cardStyle = cardBgColors[item.status] || 'bg-white border-slate-200 hover:border-slate-300';
+
         const card = document.createElement('div');
-        card.className = "bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between";
+        card.className = `${cardStyle} p-5 rounded-2xl border shadow-sm hover:shadow-md transition flex flex-col justify-between`;
         card.innerHTML = `
           <div>
             <div class="flex justify-between items-start mb-2">
@@ -548,17 +559,17 @@
             </div>
             <div class="flex items-start justify-between group mb-2">
               <h3 class="font-bold text-slate-800 text-base leading-snug pr-2">${item.topic}</h3>
-              <button onclick="copyTopic(\`${(item.topic || '').replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 bg-slate-50 hover:bg-purple-50 p-1.5 rounded-lg border border-slate-100 transition shrink-0">
+              <button onclick="copyTopic(\`${(item.topic || '').replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 bg-white/80 hover:bg-purple-50 p-1.5 rounded-lg border border-slate-200 transition shrink-0">
                 <i class="fa-regular fa-copy"></i>
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-4 line-clamp-2">${item.caption || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
+            <p class="text-xs text-slate-600 mb-4 line-clamp-2">${item.caption || 'ไม่มีรายละเอียดเพิ่มเติม'}</p>
           </div>
           <div>
             <div class="flex flex-wrap gap-1.5 mb-3">
-              ${(item.platforms || []).map(p => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
+              ${(item.platforms || []).map(p => `<span class="bg-white/90 border border-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
             </div>
-            <div class="text-xs sm:text-sm text-slate-600 pt-3 border-t border-slate-100 flex justify-between items-center">
+            <div class="text-xs sm:text-sm text-slate-600 pt-3 border-t border-slate-200/60 flex justify-between items-center">
               <span>📷 ถ่าย: <strong class="font-semibold text-slate-700">${formatDate(item.shootDate)}</strong></span>
               <span>🚀 ลง: <strong class="font-bold text-purple-700">${formatDate(item.publishDate)}</strong></span>
             </div>
@@ -681,7 +692,6 @@
           return d.getFullYear() === year && d.getMonth() === month && d.getDate() >= w.start && d.getDate() <= w.end;
         });
 
-        // เรียงลำดับตามวันที่ในสัปดาห์
         weekItems.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
 
         const weekCard = document.createElement('div');
