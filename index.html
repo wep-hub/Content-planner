@@ -68,7 +68,7 @@
     <!-- Dashboard Stat Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
       <div onclick="setFilterStatus('all')" class="cursor-pointer bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-300 transition">
-        <div class="text-[11px] text-slate-500 font-medium">งานที่ต้องทำ</div>
+        <div class="text-[11px] text-slate-500 font-medium">ทั้งหมด</div>
         <div id="statAll" class="text-lg font-bold text-slate-800 mt-0.5">0</div>
       </div>
       <div onclick="setFilterStatus('ไอเดีย')" class="cursor-pointer bg-white p-3 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm hover:border-amber-400 transition">
@@ -118,13 +118,13 @@
           </select>
 
           <select id="statusFilter" onchange="renderContent()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <option value="all">คิวงานทั้งหมด (ซ่อนที่ลงแล้ว)</option>
+            <option value="all">คิวงานทั้งหมด</option>
             <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ</option>
             <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย</option>
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
             <option value="รอตัด">🟣 รอตัด</option>
             <option value="พร้อมลง">🟡 พร้อมลง</option>
-            <option value="ลงแล้ว">🟢 ลงแล้ว (คลังงานที่ลงแล้ว)</option>
+            <option value="ลงแล้ว">🟢 ลงแล้ว</option>
           </select>
         </div>
       </div>
@@ -298,7 +298,7 @@
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">📌 สถานะ</label>
           <select id="status" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ (ยังไม่ลงปฏิทิน)</option>
+            <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ</option>
             <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย / วางแผน</option>
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
             <option value="รอตัด">🟣 รอตัด / กำลังตัดต่อ</option>
