@@ -14,6 +14,16 @@
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    
+    /* สไตล์สำหรับการ Export PDF โดยเฉพาะเพื่อแก้ปัญหาอิโมจิทับซ้อน */
+    #pdfReportTemplate {
+      font-family: 'Kanit', sans-serif !important;
+      line-height: 1.6 !important;
+    }
+    #pdfReportTemplate td, #pdfReportTemplate th {
+      line-height: 1.6 !important;
+      word-break: break-word !important;
+    }
   </style>
 </head>
 <body class="text-slate-800 min-h-screen pb-12">
@@ -213,12 +223,12 @@
     <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
   </div>
 
-  <!-- Hidden Container สำหรับ Render รายงาน PDF สวยงาม -->
-  <div id="pdfReportTemplate" class="hidden bg-white p-8 font-sans text-slate-800">
+  <!-- Hidden Container สำหรับ Render รายงาน PDF สวยงาม (ปรับแต่งบรรทัดให้พอดี ไม่ทับอิโมจิ) -->
+  <div id="pdfReportTemplate" class="hidden bg-white p-8 text-slate-800 leading-relaxed">
     <div class="border-b-2 border-purple-600 pb-4 mb-6 flex justify-between items-end">
       <div>
-        <h1 class="text-2xl font-bold text-purple-700">รายงานสรุปภาพรวมคอนเทนต์ประจำเดือน</h1>
-        <p class="text-sm text-slate-500">Sunny Rise Up Café</p>
+        <h1 class="text-2xl font-bold text-purple-700 pt-2">รายงานสรุปภาพรวมคอนเทนต์ประจำเดือน</h1>
+        <p class="text-sm text-slate-500 font-medium">Sunny Rise Up Café</p>
       </div>
       <div class="text-right">
         <span id="pdfMonthTitle" class="text-lg font-bold text-slate-700"></span>
@@ -228,19 +238,19 @@
     <!-- สถิติภาพรวม -->
     <div class="grid grid-cols-4 gap-4 mb-6 text-center">
       <div class="p-3 bg-purple-50 rounded-xl border border-purple-100">
-        <div class="text-xs text-slate-500">คอนเทนต์ทั้งหมด</div>
+        <div class="text-xs text-slate-500 font-medium">คอนเทนต์ทั้งหมด</div>
         <div id="pdfTotalCount" class="text-xl font-bold text-purple-700 mt-1">0</div>
       </div>
       <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-        <div class="text-xs text-slate-500">ลงแล้ว</div>
+        <div class="text-xs text-slate-500 font-medium">ลงแล้ว</div>
         <div id="pdfPublishedCount" class="text-xl font-bold text-emerald-700 mt-1">0</div>
       </div>
       <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
-        <div class="text-xs text-slate-500">รอตัด / พร้อมลง</div>
+        <div class="text-xs text-slate-500 font-medium">รอตัด / พร้อมลง</div>
         <div id="pdfPendingCount" class="text-xl font-bold text-blue-700 mt-1">0</div>
       </div>
       <div class="p-3 bg-amber-50 rounded-xl border border-amber-100">
-        <div class="text-xs text-slate-500">คลังไอเดีย</div>
+        <div class="text-xs text-slate-500 font-medium">คลังไอเดีย</div>
         <div id="pdfIdeaCount" class="text-xl font-bold text-amber-700 mt-1">0</div>
       </div>
     </div>
@@ -262,10 +272,10 @@
       <table class="w-full text-xs text-left border-collapse border border-slate-200">
         <thead>
           <tr class="bg-slate-100 text-slate-700">
-            <th class="border border-slate-200 p-2 w-24">วันที่ลง</th>
-            <th class="border border-slate-200 p-2">หัวข้อคอนเทนต์</th>
-            <th class="border border-slate-200 p-2 w-32">ช่องทาง</th>
-            <th class="border border-slate-200 p-2 w-24">สถานะ</th>
+            <th class="border border-slate-200 p-2.5 w-24">วันที่ลง</th>
+            <th class="border border-slate-200 p-2.5">หัวข้อคอนเทนต์</th>
+            <th class="border border-slate-200 p-2.5 w-32">ช่องทาง</th>
+            <th class="border border-slate-200 p-2.5 w-24">สถานะ</th>
           </tr>
         </thead>
         <tbody id="pdfTableBody"></tbody>
@@ -473,7 +483,7 @@
       return status === 'ลงแล้ว' || status === '🟢 ลงแล้ว';
     }
 
-    // ฟังก์ชันสร้างภาพสรุปรายงาน PDF ของเดือนที่ดูอยู่
+    // ฟังก์ชันสร้างภาพสรุปรายงาน PDF ของเดือนที่ดูอยู่ (ปรับแต่งขอบและการเว้นวรรค)
     function exportMonthlyPDF() {
       const year = calendarDate.getFullYear();
       const month = calendarDate.getMonth();
@@ -524,12 +534,12 @@
       } else {
         monthContents.forEach(item => {
           const tr = document.createElement('tr');
-          tr.className = "border-b border-slate-100";
+          tr.className = "border-b border-slate-200";
           tr.innerHTML = `
-            <td class="p-2 border border-slate-200">${formatDate(item.publishDate)}</td>
-            <td class="p-2 border border-slate-200 font-semibold text-slate-800">${item.topic}</td>
-            <td class="p-2 border border-slate-200">${(item.platforms || []).join(', ')}</td>
-            <td class="p-2 border border-slate-200">${item.status}</td>
+            <td class="p-2.5 border border-slate-200 font-medium">${formatDate(item.publishDate)}</td>
+            <td class="p-2.5 border border-slate-200 font-semibold text-slate-800 leading-normal">${item.topic}</td>
+            <td class="p-2.5 border border-slate-200">${(item.platforms || []).join(', ')}</td>
+            <td class="p-2.5 border border-slate-200 font-medium">${item.status}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -539,10 +549,10 @@
       element.classList.remove('hidden');
 
       const opt = {
-        margin:       0.5,
+        margin:       0.4,
         filename:     `Content-Plan-${monthNames[month]}-${year+543}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
+        html2canvas:  { scale: 2, useCORS: true },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
       };
 
