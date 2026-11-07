@@ -6,6 +6,8 @@
   <title>แพลนคอนเทนต์ - Sunny Rise Up Café</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- html2pdf.js สำหรับแปลง HTML เป็นไฟล์ PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
     body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; }
@@ -31,10 +33,16 @@
         </div>
 
         <div class="flex items-center space-x-2">
-          <!-- ปุ่มสรุปแพลนส่ง LINE -->
-          <button onclick="copyWeeklySummary()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
+          <!-- ปุ่มดาวน์โหลดสรุป PDF เดือนนั้น -->
+          <button onclick="exportMonthlyPDF()" class="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
+            <i class="fa-solid fa-file-pdf text-base text-purple-600"></i>
+            <span class="hidden sm:inline">โหลดรายงาน PDF</span>
+            <span class="sm:hidden">PDF</span>
+          </button>
+          <!-- ปุ่มสรุปแพลนส่ง LINE ประจำเดือน -->
+          <button onclick="copyMonthlySummary()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center space-x-1.5 shadow-sm">
             <i class="fa-brands fa-line text-base text-emerald-600"></i>
-            <span class="hidden sm:inline">คัดลอกแพลนส่ง LINE</span>
+            <span class="hidden sm:inline">คัดลอกสรุปเดือนนี้ส่ง LINE</span>
             <span class="sm:hidden">สรุปส่งไลน์</span>
           </button>
         </div>
@@ -68,7 +76,7 @@
     <!-- Dashboard Stat Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
       <div onclick="setFilterStatus('all')" class="cursor-pointer bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-300 transition">
-        <div class="text-[11px] text-slate-500 font-medium">ทั้งหมด</div>
+        <div class="text-[11px] text-slate-500 font-medium">งานที่ต้องทำ</div>
         <div id="statAll" class="text-lg font-bold text-slate-800 mt-0.5">0</div>
       </div>
       <div onclick="setFilterStatus('ไอเดีย')" class="cursor-pointer bg-white p-3 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm hover:border-amber-400 transition">
@@ -118,13 +126,13 @@
           </select>
 
           <select id="statusFilter" onchange="renderContent()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <option value="all">คิวงานทั้งหมด</option>
+            <option value="all">คิวงานทั้งหมด (ซ่อนที่ลงแล้ว)</option>
             <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ</option>
             <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย</option>
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
             <option value="รอตัด">🟣 รอตัด</option>
             <option value="พร้อมลง">🟡 พร้อมลง</option>
-            <option value="ลงแล้ว">🟢 ลงแล้ว</option>
+            <option value="ลงแล้ว">🟢 ลงแล้ว (คลังงานที่ลงแล้ว)</option>
           </select>
         </div>
       </div>
@@ -203,6 +211,66 @@
   <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs sm:text-sm flex items-center space-x-2 opacity-0 transition-opacity duration-300 pointer-events-none z-50">
     <i class="fa-solid fa-circle-check text-emerald-400"></i>
     <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
+  </div>
+
+  <!-- Hidden Container สำหรับ Render รายงาน PDF สวยงาม -->
+  <div id="pdfReportTemplate" class="hidden bg-white p-8 font-sans text-slate-800">
+    <div class="border-b-2 border-purple-600 pb-4 mb-6 flex justify-between items-end">
+      <div>
+        <h1 class="text-2xl font-bold text-purple-700">รายงานสรุปภาพรวมคอนเทนต์ประจำเดือน</h1>
+        <p class="text-sm text-slate-500">Sunny Rise Up Café</p>
+      </div>
+      <div class="text-right">
+        <span id="pdfMonthTitle" class="text-lg font-bold text-slate-700"></span>
+      </div>
+    </div>
+
+    <!-- สถิติภาพรวม -->
+    <div class="grid grid-cols-4 gap-4 mb-6 text-center">
+      <div class="p-3 bg-purple-50 rounded-xl border border-purple-100">
+        <div class="text-xs text-slate-500">คอนเทนต์ทั้งหมด</div>
+        <div id="pdfTotalCount" class="text-xl font-bold text-purple-700 mt-1">0</div>
+      </div>
+      <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+        <div class="text-xs text-slate-500">ลงแล้ว</div>
+        <div id="pdfPublishedCount" class="text-xl font-bold text-emerald-700 mt-1">0</div>
+      </div>
+      <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
+        <div class="text-xs text-slate-500">รอตัด / พร้อมลง</div>
+        <div id="pdfPendingCount" class="text-xl font-bold text-blue-700 mt-1">0</div>
+      </div>
+      <div class="p-3 bg-amber-50 rounded-xl border border-amber-100">
+        <div class="text-xs text-slate-500">คลังไอเดีย</div>
+        <div id="pdfIdeaCount" class="text-xl font-bold text-amber-700 mt-1">0</div>
+      </div>
+    </div>
+
+    <!-- สรุปแยกตามแพลตฟอร์ม -->
+    <div class="mb-6">
+      <h3 class="text-sm font-bold text-slate-700 mb-2">สรุปตามแพลตฟอร์ม:</h3>
+      <div class="grid grid-cols-4 gap-2 text-xs">
+        <div class="p-2 border rounded-lg bg-emerald-50/40 text-emerald-800 border-emerald-200">TikTok หลัก: <strong id="pdfTtMain">0</strong></div>
+        <div class="p-2 border rounded-lg bg-pink-50/40 text-pink-800 border-pink-200">TikTok รอง: <strong id="pdfTtSub">0</strong></div>
+        <div class="p-2 border rounded-lg bg-sky-50/40 text-sky-800 border-sky-200">Facebook: <strong id="pdfFb">0</strong></div>
+        <div class="p-2 border rounded-lg bg-purple-50/40 text-purple-800 border-purple-200">Instagram: <strong id="pdfIg">0</strong></div>
+      </div>
+    </div>
+
+    <!-- รายการคอนเทนต์ประจำเดือน -->
+    <div>
+      <h3 class="text-sm font-bold text-slate-700 mb-3">ตารางคอนเทนต์ทั้งหมดในเดือนนี้:</h3>
+      <table class="w-full text-xs text-left border-collapse border border-slate-200">
+        <thead>
+          <tr class="bg-slate-100 text-slate-700">
+            <th class="border border-slate-200 p-2 w-24">วันที่ลง</th>
+            <th class="border border-slate-200 p-2">หัวข้อคอนเทนต์</th>
+            <th class="border border-slate-200 p-2 w-32">ช่องทาง</th>
+            <th class="border border-slate-200 p-2 w-24">สถานะ</th>
+          </tr>
+        </thead>
+        <tbody id="pdfTableBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Day View Modal -->
@@ -298,7 +366,7 @@
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">📌 สถานะ</label>
           <select id="status" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ</option>
+            <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ (ยังไม่ลงปฏิทิน)</option>
             <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย / วางแผน</option>
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
             <option value="รอตัด">🟣 รอตัด / กำลังตัดต่อ</option>
@@ -353,33 +421,33 @@
       renderContent();
     }
 
-    function copyWeeklySummary() {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    // สรุปแพลนส่ง LINE ทั้งหมดในเดือนปัจจุบันที่เลือกอยู่
+    function copyMonthlySummary() {
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+      const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 
-      const nextWeek = new Date(today);
-      nextWeek.setDate(today.getDate() + 7);
-
-      const weekContents = contents.filter(c => {
+      const monthContents = contents.filter(c => {
         if(!c.publishDate || isDone(c.status)) return false;
         const d = new Date(c.publishDate);
-        return d >= today && d <= nextWeek;
+        return d.getFullYear() === year && d.getMonth() === month;
       });
 
-      if(weekContents.length === 0) {
-        showToast('ไม่มีแพลนคอนเทนต์ใน 7 วันข้างหน้า');
+      if(monthContents.length === 0) {
+        showToast(`ไม่มีแพลนคอนเทนต์ในเดือน${monthNames[month]}`);
         return;
       }
 
-      weekContents.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+      // เรียงลำดับวันที่จาก 1 -> 30/31 (น้อยไปมาก)
+      monthContents.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
 
-      let summaryText = `📋 สรุปแพลนคอนเทนต์ 7 วันข้างหน้า\nSunny Rise Up Café\n-------------------------\n`;
-      weekContents.forEach(item => {
+      let summaryText = `📋 สรุปแพลนคอนเทนต์ประจำเดือน ${monthNames[month]} ${year + 543}\nSunny Rise Up Café\n-------------------------\n`;
+      monthContents.forEach(item => {
         summaryText += `🗓️ วันที่ลง : ${formatDate(item.publishDate)}\n• เรื่อง : ${item.topic}\n• ช่องทาง : ${(item.platforms || []).join(', ')}\n• สถานะ : ${item.status}\n\n`;
       });
 
       navigator.clipboard.writeText(summaryText).then(() => {
-        showToast('คัดลอกแพลนส่ง LINE เรียบร้อย!');
+        showToast('คัดลอกสรุปแพลนทั้งเดือนส่ง LINE เรียบร้อย!');
       });
     }
 
@@ -401,9 +469,87 @@
       });
     }
 
-    // ช่วยเช็คว่าสถานะคือลงแล้วหรือไม่
     function isDone(status) {
       return status === 'ลงแล้ว' || status === '🟢 ลงแล้ว';
+    }
+
+    // ฟังก์ชันสร้างภาพสรุปรายงาน PDF ของเดือนที่ดูอยู่
+    function exportMonthlyPDF() {
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+      const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      
+      const monthTitle = `${monthNames[month]} ${year + 543}`;
+      document.getElementById('pdfMonthTitle').innerText = monthTitle;
+
+      const monthContents = contents.filter(c => {
+        if (!c.publishDate) return false;
+        const d = new Date(c.publishDate);
+        return d.getFullYear() === year && d.getMonth() === month;
+      });
+
+      monthContents.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+
+      let countPublished = 0, countPending = 0, countIdea = 0;
+      let countTtMain = 0, countTtSub = 0, countFb = 0, countIg = 0;
+
+      monthContents.forEach(c => {
+        if (isDone(c.status)) countPublished++;
+        else if (c.status === 'รอตัด' || c.status === 'พร้อมลง' || c.status === 'ถ่ายแล้ว') countPending++;
+        else if (c.status === 'ไอเดีย') countIdea++;
+
+        (c.platforms || []).forEach(p => {
+          if (p === 'TikTok ช่องหลัก') countTtMain++;
+          if (p === 'TikTok ช่องรอง') countTtSub++;
+          if (p === 'Facebook') countFb++;
+          if (p === 'Instagram') countIg++;
+        });
+      });
+
+      document.getElementById('pdfTotalCount').innerText = monthContents.length;
+      document.getElementById('pdfPublishedCount').innerText = countPublished;
+      document.getElementById('pdfPendingCount').innerText = countPending;
+      document.getElementById('pdfIdeaCount').innerText = countIdea;
+
+      document.getElementById('pdfTtMain').innerText = countTtMain;
+      document.getElementById('pdfTtSub').innerText = countTtSub;
+      document.getElementById('pdfFb').innerText = countFb;
+      document.getElementById('pdfIg').innerText = countIg;
+
+      const tbody = document.getElementById('pdfTableBody');
+      tbody.innerHTML = '';
+
+      if (monthContents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่มีรายการคอนเทนต์ในเดือนนี้</td></tr>`;
+      } else {
+        monthContents.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.className = "border-b border-slate-100";
+          tr.innerHTML = `
+            <td class="p-2 border border-slate-200">${formatDate(item.publishDate)}</td>
+            <td class="p-2 border border-slate-200 font-semibold text-slate-800">${item.topic}</td>
+            <td class="p-2 border border-slate-200">${(item.platforms || []).join(', ')}</td>
+            <td class="p-2 border border-slate-200">${item.status}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      const element = document.getElementById('pdfReportTemplate');
+      element.classList.remove('hidden');
+
+      const opt = {
+        margin:       0.5,
+        filename:     `Content-Plan-${monthNames[month]}-${year+543}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        element.classList.add('hidden');
+        showToast('ดาวน์โหลดไฟล์ PDF เรียบร้อย!');
+      });
     }
 
     function updateUI() {
@@ -486,7 +632,6 @@
     }
 
     function updateStats() {
-      // นับการ์ด "งานที่ต้องทำ" โดยตัด "ลงแล้ว" ออกอย่างเด็ดขาด
       const activeContents = contents.filter(c => !isDone(c.status));
       document.getElementById('statAll').innerText = activeContents.length;
 
@@ -522,7 +667,6 @@
         
         let matchStatus = false;
         if (status === 'all') {
-          // ในโหมด "ทั้งหมด" / "คิวงานทั้งหมด" ให้ซ่อนรายการที่ "ลงแล้ว" ออกเสมอ
           matchStatus = !isDone(item.status);
         } else if (status === 'ลงแล้ว') {
           matchStatus = isDone(item.status);
