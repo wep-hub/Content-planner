@@ -68,7 +68,7 @@
     <!-- Dashboard Stat Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 mb-6">
       <div onclick="setFilterStatus('all')" class="cursor-pointer bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:border-purple-300 transition">
-        <div class="text-[11px] text-slate-500 font-medium">คิวงานทั้งหมด</div>
+        <div class="text-[11px] text-slate-500 font-medium">งานที่ต้องทำ</div>
         <div id="statAll" class="text-lg font-bold text-slate-800 mt-0.5">0</div>
       </div>
       <div onclick="setFilterStatus('ไอเดีย')" class="cursor-pointer bg-white p-3 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-sm hover:border-amber-400 transition">
@@ -118,7 +118,7 @@
           </select>
 
           <select id="statusFilter" onchange="renderContent()" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <option value="all">คิวงานทั้งหมด (ยกเว้นที่ลงแล้ว)</option>
+            <option value="all">คิวงานทั้งหมด (ซ่อนที่ลงแล้ว)</option>
             <option value="ไอเดีย">💡 ไอเดีย / คลิปที่อยากทำ</option>
             <option value="ยังไม่ถ่าย">🔴 ยังไม่ถ่าย</option>
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
@@ -303,7 +303,7 @@
             <option value="ถ่ายแล้ว">🔵 ถ่ายแล้ว</option>
             <option value="รอตัด">🟣 รอตัด / กำลังตัดต่อ</option>
             <option value="พร้อมลง">🟡 พร้อมลง</option>
-            <option value="ลงแล้ว">🟢 ลงแล้ว</option>
+            <option value="ลงแล้ว">🟢 ลงแล้ว (เสร็จสิ้น)</option>
           </select>
         </div>
 
@@ -361,7 +361,7 @@
       nextWeek.setDate(today.getDate() + 7);
 
       const weekContents = contents.filter(c => {
-        if(!c.publishDate) return false;
+        if(!c.publishDate || isDone(c.status)) return false;
         const d = new Date(c.publishDate);
         return d >= today && d <= nextWeek;
       });
@@ -399,6 +399,11 @@
       navigator.clipboard.writeText(summaryText).then(() => {
         showToast('คัดลอกสรุปไอเดียส่ง LINE เรียบร้อย!');
       });
+    }
+
+    // ช่วยเช็คว่าสถานะคือลงแล้วหรือไม่
+    function isDone(status) {
+      return status === 'ลงแล้ว' || status === '🟢 ลงแล้ว';
     }
 
     function updateUI() {
@@ -481,15 +486,16 @@
     }
 
     function updateStats() {
-      // นับรวมเฉพาะที่ยังไม่ลง
-      const activeContents = contents.filter(c => c.status !== 'ลงแล้ว');
+      // นับการ์ด "งานที่ต้องทำ" โดยตัด "ลงแล้ว" ออกอย่างเด็ดขาด
+      const activeContents = contents.filter(c => !isDone(c.status));
       document.getElementById('statAll').innerText = activeContents.length;
+
       document.getElementById('statIdea').innerText = contents.filter(c => c.status === 'ไอเดีย').length;
       document.getElementById('statPlanning').innerText = contents.filter(c => c.status === 'ยังไม่ถ่าย').length;
       document.getElementById('statFilmed').innerText = contents.filter(c => c.status === 'ถ่ายแล้ว').length;
       document.getElementById('statEditing').innerText = contents.filter(c => c.status === 'รอตัด').length;
       document.getElementById('statReady').innerText = contents.filter(c => c.status === 'พร้อมลง').length;
-      document.getElementById('statPublished').innerText = contents.filter(c => c.status === 'ลงแล้ว').length;
+      document.getElementById('statPublished').innerText = contents.filter(c => isDone(c.status)).length;
     }
 
     function setFilterStatus(status) {
@@ -514,10 +520,12 @@
         const matchSearch = (item.topic || '').toLowerCase().includes(search) || (item.caption && item.caption.toLowerCase().includes(search));
         const matchPlatform = platform === 'all' || (item.platforms && item.platforms.includes(platform));
         
-        // แยก логиกสถานะ: ถ้าเลือก 'all' ให้ซ่อนรายการที่ 'ลงแล้ว'
         let matchStatus = false;
         if (status === 'all') {
-          matchStatus = item.status !== 'ลงแล้ว';
+          // ในโหมด "ทั้งหมด" / "คิวงานทั้งหมด" ให้ซ่อนรายการที่ "ลงแล้ว" ออกเสมอ
+          matchStatus = !isDone(item.status);
+        } else if (status === 'ลงแล้ว') {
+          matchStatus = isDone(item.status);
         } else {
           matchStatus = item.status === status;
         }
@@ -529,7 +537,7 @@
       grid.innerHTML = '';
 
       if(filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">ไม่พบรายการคอนเทนต์</div>`;
+        grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">ไม่พบรายการคอนเทนต์ในหมวดนี้</div>`;
         return;
       }
 
@@ -814,7 +822,7 @@
       const [y, m, d] = targetDateStr.split('-');
       document.getElementById('ideaPickerSub').innerText = `เลือกคอนเทนต์มาลงวันที่ ${Number(d)}/${Number(m)}/${Number(y) + 543}`;
 
-      const unassignedItems = contents.filter(c => c.status === 'ไอเดีย' || !c.publishDate || c.publishDate === '-' || c.publishDate === '');
+      const unassignedItems = contents.filter(c => (c.status === 'ไอเดีย' || !c.publishDate || c.publishDate === '-' || c.publishDate === '') && !isDone(c.status));
 
       const listEl = document.getElementById('ideaPickerList');
       listEl.innerHTML = '';
