@@ -175,7 +175,7 @@
     <span id="toastMsg">คัดลอกข้อความแล้ว!</span>
   </div>
 
-  <!-- Day View Modal -->
+  <!-- Day View Modal (หน้าต่างประจำวัน) -->
   <div id="dayModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar flex flex-col">
       <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
@@ -188,12 +188,32 @@
 
       <div id="dayModalList" class="space-y-3 flex-1 overflow-y-auto"></div>
 
-      <div class="pt-4 mt-2 border-t border-slate-100 flex justify-between items-center">
+      <!-- ปุ่มดำเนินการประจำวัน -->
+      <div class="pt-4 mt-2 border-t border-slate-100 flex flex-col space-y-2">
+        <button id="dayModalPickIdeaBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center space-x-1.5 shadow-md shadow-amber-200">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span>ดึงไอเดียที่ค้างอยู่มาลงวันนี้</span>
+        </button>
         <button id="dayModalAddBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center space-x-1.5 shadow-md shadow-purple-200">
           <i class="fa-solid fa-plus"></i>
-          <span>เพิ่มแพลนในวันนี้</span>
+          <span>สร้างแพลนใหม่ในวันนี้</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Idea Picker Modal (หน้าต่างดึงไอเดียคลัง) -->
+  <div id="ideaPickerModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl max-h-[80vh] overflow-y-auto custom-scrollbar flex flex-col">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-bold text-slate-800">เลือกไอเดียมาลงปฏิทิน</h3>
+          <p id="ideaPickerSub" class="text-xs text-slate-400 font-normal">คลิกเลือกคอนเทนต์ที่ต้องการกำหนดวัน</p>
+        </div>
+        <button onclick="closeIdeaPickerModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <div id="ideaPickerList" class="space-y-3 flex-1 overflow-y-auto"></div>
     </div>
   </div>
 
@@ -277,6 +297,7 @@
     let contents = JSON.parse(localStorage.getItem('cafe_contents_v2')) || [];
     let currentView = 'list';
     let calendarDate = new Date();
+    let selectedDateForPick = '';
 
     function formatDate(dateStr) {
       if (!dateStr || dateStr === '-') return '-';
@@ -527,7 +548,6 @@
         const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr);
         const hasContent = dayContents.length > 0;
 
-        // คำนวณสีพื้นหลังและสีเส้นกรอบของช่องวัน ตามแพลตฟอร์มหลัก
         let cardColorStyle = "bg-white border-slate-100 hover:border-purple-300";
         if (hasContent) {
           const allPlatforms = dayContents.flatMap(c => c.platforms || []);
@@ -577,12 +597,9 @@
     }
 
     function handleDayClick(dateStr) {
+      selectedDateForPick = dateStr;
       const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr);
-      if (dayContents.length > 0) {
-        openDayModal(dateStr, dayContents);
-      } else {
-        openModal(dateStr);
-      }
+      openDayModal(dateStr, dayContents);
     }
 
     function openDayModal(dateStr, dayContents) {
@@ -590,48 +607,112 @@
       const formattedDate = `ประจำวันที่ ${Number(d)}/${Number(m)}/${Number(y) + 543}`;
       
       document.getElementById('dayModalSub').innerText = formattedDate;
+      
+      // ตั้งค่าปุ่มใน Modal
       document.getElementById('dayModalAddBtn').onclick = () => {
         closeDayModal();
         openModal(dateStr);
+      };
+      document.getElementById('dayModalPickIdeaBtn').onclick = () => {
+        closeDayModal();
+        openIdeaPickerModal(dateStr);
       };
 
       const listContainer = document.getElementById('dayModalList');
       listContainer.innerHTML = '';
 
-      const badgeColors = {
-        'ไอเดีย': 'bg-amber-100 text-amber-800 border-amber-300',
-        'ยังไม่ถ่าย': 'bg-rose-100 text-rose-700 border-rose-200',
-        'ถ่ายแล้ว': 'bg-blue-100 text-blue-700 border-blue-200',
-        'รอตัด': 'bg-purple-100 text-purple-700 border-purple-200',
-        'พร้อมลง': 'bg-emerald-100 text-emerald-700 border-emerald-200',
-        'ลงแล้ว': 'bg-slate-100 text-slate-700 border-slate-200'
-      };
+      if (dayContents.length === 0) {
+        listContainer.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs">ยังไม่มีแพลนคอนเทนต์ในวันนี้</div>`;
+      } else {
+        const badgeColors = {
+          'ไอเดีย': 'bg-amber-100 text-amber-800 border-amber-300',
+          'ยังไม่ถ่าย': 'bg-rose-100 text-rose-700 border-rose-200',
+          'ถ่ายแล้ว': 'bg-blue-100 text-blue-700 border-blue-200',
+          'รอตัด': 'bg-purple-100 text-purple-700 border-purple-200',
+          'พร้อมลง': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+          'ลงแล้ว': 'bg-slate-100 text-slate-700 border-slate-200'
+        };
 
-      dayContents.forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-2";
-        itemEl.innerHTML = `
-          <div class="flex justify-between items-start">
-            <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status}</span>
-            <div class="flex space-x-1">
-              <button onclick="copyTopic(\`${(item.topic || '').replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-regular fa-copy"></i></button>
-              <button onclick="closeDayModal(); editContent('${item.id}');" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+        dayContents.forEach(item => {
+          const itemEl = document.createElement('div');
+          itemEl.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-2";
+          itemEl.innerHTML = `
+            <div class="flex justify-between items-start">
+              <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status}</span>
+              <div class="flex space-x-1">
+                <button onclick="copyTopic(\`${(item.topic || '').replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-regular fa-copy"></i></button>
+                <button onclick="closeDayModal(); editContent('${item.id}');" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+              </div>
             </div>
-          </div>
-          <h4 class="font-bold text-slate-800 text-sm leading-snug">${item.topic}</h4>
-          ${item.caption ? `<p class="text-xs text-slate-500 line-clamp-2">${item.caption}</p>` : ''}
-          <div class="flex flex-wrap gap-1 pt-1">
-            ${(item.platforms || []).map(p => `<span class="bg-white border border-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
-          </div>
-        `;
-        listContainer.appendChild(itemEl);
-      });
+            <h4 class="font-bold text-slate-800 text-sm leading-snug">${item.topic}</h4>
+            ${item.caption ? `<p class="text-xs text-slate-500 line-clamp-2">${item.caption}</p>` : ''}
+            <div class="flex flex-wrap gap-1 pt-1">
+              ${(item.platforms || []).map(p => `<span class="bg-white border border-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
+            </div>
+          `;
+          listContainer.appendChild(itemEl);
+        });
+      }
 
       document.getElementById('dayModal').classList.remove('hidden');
     }
 
     function closeDayModal() {
       document.getElementById('dayModal').classList.add('hidden');
+    }
+
+    // เปิด Modal เลือกดึงไอเดียที่ค้างอยู่
+    function openIdeaPickerModal(targetDateStr) {
+      selectedDateForPick = targetDateStr;
+      const [y, m, d] = targetDateStr.split('-');
+      document.getElementById('ideaPickerSub').innerText = `เลือกคอนเทนต์มาลงวันที่ ${Number(d)}/${Number(m)}/${Number(y) + 543}`;
+
+      // กรองเอาคอนเทนต์ที่เป็น "ไอเดีย" หรือยังไม่ได้ระบุวันลง
+      const unassignedItems = contents.filter(c => c.status === 'ไอเดีย' || !c.publishDate || c.publishDate === '-' || c.publishDate === '');
+
+      const listEl = document.getElementById('ideaPickerList');
+      listEl.innerHTML = '';
+
+      if (unassignedItems.length === 0) {
+        listEl.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">ไม่มีไอเดียที่ค้างอยู่เลย 🎉</div>`;
+      } else {
+        unassignedItems.forEach(item => {
+          const itemCard = document.createElement('div');
+          itemCard.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 hover:border-amber-400 transition flex items-center justify-between space-x-3";
+          itemCard.innerHTML = `
+            <div class="flex-1 min-w-0">
+              <span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-300 mb-1">💡 ไอเดีย</span>
+              <h4 class="font-bold text-slate-800 text-xs sm:text-sm truncate">${item.topic}</h4>
+              <p class="text-[11px] text-slate-400 truncate">${item.caption || 'ไม่มีแคปชั่น'}</p>
+            </div>
+            <button onclick="assignIdeaToDate('${item.id}', '${targetDateStr}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shrink-0 shadow-sm">
+              ดึงมาลงวันนี้
+            </button>
+          `;
+          listEl.appendChild(itemCard);
+        });
+      }
+
+      document.getElementById('ideaPickerModal').classList.remove('hidden');
+    }
+
+    function closeIdeaPickerModal() {
+      document.getElementById('ideaPickerModal').classList.add('hidden');
+    }
+
+    // กำหนดวันลงให้คอนเทนต์ไอเดีย
+    function assignIdeaToDate(itemId, targetDateStr) {
+      const index = contents.findIndex(c => String(c.id) === String(itemId));
+      if (index !== -1) {
+        contents[index].publishDate = targetDateStr;
+        // ถ้าสถานะเดิมเป็น "ไอเดีย" ปรับเป็น "ยังไม่ถ่าย" เพื่อให้พร้อมลุยต่อ
+        if (contents[index].status === 'ไอเดีย') {
+          contents[index].status = 'ยังไม่ถ่าย';
+        }
+        saveDataToCloud();
+        closeIdeaPickerModal();
+        showToast('ดึงคอนเทนต์ลงปฏิทินเรียบร้อย!');
+      }
     }
 
     function prevMonth() { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }
