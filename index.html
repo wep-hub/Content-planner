@@ -277,8 +277,9 @@
       <table class="pdf-table border-collapse border border-slate-200">
         <thead>
           <tr class="bg-slate-100 text-slate-700">
-            <th class="border border-slate-200 pdf-cell" style="width: 22%;">วันที่ลง</th>
-            <th class="border border-slate-200 pdf-cell" style="width: 48%;">หัวข้อคอนเทนต์</th>
+            <th class="border border-slate-200 pdf-cell" style="width: 17%;">วันที่ลง</th>
+            <th class="border border-slate-200 pdf-cell" style="width: 13%;">เวลาลง</th>
+            <th class="border border-slate-200 pdf-cell" style="width: 40%;">หัวข้อคอนเทนต์</th>
             <th class="border border-slate-200 pdf-cell" style="width: 18%;">ช่องทาง</th>
             <th class="border border-slate-200 pdf-cell" style="width: 12%;">สถานะ</th>
           </tr>
@@ -345,14 +346,18 @@
           <input type="text" id="topic" required placeholder="ลงข้อมูล" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">📅 วันที่ถ่ายทำ <span class="text-slate-400 font-normal">(ระบุหรือไม่ก็ได้)</span></label>
-            <input type="date" id="shootDate" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">📅 วันที่ถ่ายทำ <span class="text-slate-400 font-normal">(ไม่บังคับ)</span></label>
+            <input type="date" id="shootDate" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">🚀 วันที่กำหนดลง <span class="text-slate-400 font-normal">(ไม่บังคับ)</span></label>
-            <input type="date" id="publishDate" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <input type="date" id="publishDate" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">⏰ เวลาลงโพสต์ <span class="text-slate-400 font-normal">(ไม่บังคับ)</span></label>
+            <input type="time" id="publishTime" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
           </div>
         </div>
 
@@ -423,6 +428,27 @@
       return `${year}-${month}-${day}`;
     }
 
+    // จัดรูปแบบเวลาให้อ่านง่าย (รองรับค่าเวลาที่อาจส่งมาจาก Google Sheets)
+    function formatTime(timeStr) {
+      if (!timeStr || timeStr === '-') return '';
+      if (typeof timeStr === 'string' && timeStr.includes('T')) {
+        const d = new Date(timeStr);
+        if (!isNaN(d.getTime())) {
+          return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+      }
+      return String(timeStr).slice(0, 5);
+    }
+
+    // ฟังก์ชันเรียงลำดับตามวันที่ และเวลาลงโพสต์
+    function sortByDateAndTime(a, b) {
+      const dateDiff = new Date(a.publishDate) - new Date(b.publishDate);
+      if (dateDiff !== 0) return dateDiff;
+      const timeA = formatTime(a.publishTime) || '99:99';
+      const timeB = formatTime(b.publishTime) || '99:99';
+      return timeA.localeCompare(timeB);
+    }
+
     function toggleClearBtn() {
       const searchVal = document.getElementById('searchInput').value;
       const clearBtn = document.getElementById('clearSearchBtn');
@@ -453,12 +479,14 @@
         return;
       }
 
-      // เรียงลำดับวันที่จาก 1 -> 30/31 (น้อยไปมาก)
-      monthContents.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+      // เรียงลำดับวันที่จาก 1 -> 30/31 และเรียงตามเวลา
+      monthContents.sort(sortByDateAndTime);
 
       let summaryText = `📋 สรุปแพลนคอนเทนต์ประจำเดือน ${monthNames[month]} ${year + 543}\nSunny Rise Up Café\n-------------------------\n`;
       monthContents.forEach(item => {
-        summaryText += `🗓️ วันที่ลง : ${formatDate(item.publishDate)}\n• เรื่อง : ${item.topic}\n• ช่องทาง : ${(item.platforms || []).join(', ')}\n• สถานะ : ${item.status}\n\n`;
+        const timeFormatted = formatTime(item.publishTime);
+        const timeText = timeFormatted ? ` (เวลา ${timeFormatted} น.)` : '';
+        summaryText += `🗓️ วันที่ลง : ${formatDate(item.publishDate)}${timeText}\n• เรื่อง : ${item.topic}\n• ช่องทาง : ${(item.platforms || []).join(', ')}\n• สถานะ : ${item.status}\n\n`;
       });
 
       navigator.clipboard.writeText(summaryText).then(() => {
@@ -488,7 +516,7 @@
       return status === 'ลงแล้ว' || status === '🟢 ลงแล้ว';
     }
 
-    // ฟังก์ชันสร้างรายงาน PDF ปรับแก้ HTML Structure เพื่อป้องกันข้อความทับซ้อน
+    // ฟังก์ชันสร้างรายงาน PDF พร้อมแสดงเวลาลงโพสต์
     function exportMonthlyPDF() {
       const year = calendarDate.getFullYear();
       const month = calendarDate.getMonth();
@@ -503,7 +531,7 @@
         return d.getFullYear() === year && d.getMonth() === month;
       });
 
-      monthContents.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+      monthContents.sort(sortByDateAndTime);
 
       let countPublished = 0, countPending = 0, countIdea = 0;
       let countTtMain = 0, countTtSub = 0, countFb = 0, countIg = 0;
@@ -535,13 +563,15 @@
       tbody.innerHTML = '';
 
       if (monthContents.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">ไม่มีรายการคอนเทนต์ในเดือนนี้</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">ไม่มีรายการคอนเทนต์ในเดือนนี้</td></tr>`;
       } else {
         monthContents.forEach(item => {
+          const timeText = formatTime(item.publishTime) ? `${formatTime(item.publishTime)} น.` : '-';
           const tr = document.createElement('tr');
           tr.className = "border-b border-slate-200";
           tr.innerHTML = `
             <td class="border border-slate-200 pdf-cell font-medium">${formatDate(item.publishDate)}</td>
+            <td class="border border-slate-200 pdf-cell font-medium text-purple-700">${timeText}</td>
             <td class="border border-slate-200 pdf-cell font-semibold text-slate-800">
               <div style="display: block; width: 100%; min-height: 24px; line-height: 1.8;">${item.topic || ''}</div>
             </td>
@@ -722,6 +752,8 @@
         };
 
         const cardStyle = cardBgColors[item.status] || 'bg-white border-slate-200 hover:border-slate-300';
+        const formattedTime = formatTime(item.publishTime);
+        const publishDisplay = formatDate(item.publishDate) + (formattedTime ? ` (${formattedTime} น.)` : '');
 
         const card = document.createElement('div');
         card.className = `${cardStyle} p-5 rounded-2xl border shadow-sm hover:shadow-md transition flex flex-col justify-between`;
@@ -746,9 +778,9 @@
             <div class="flex flex-wrap gap-1.5 mb-3">
               ${(item.platforms || []).map(p => `<span class="bg-white/90 border border-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-md font-medium">${p}</span>`).join('')}
             </div>
-            <div class="text-xs sm:text-sm text-slate-600 pt-3 border-t border-slate-200/60 flex justify-between items-center">
+            <div class="text-xs sm:text-sm text-slate-600 pt-3 border-t border-slate-200/60 flex flex-wrap justify-between items-center gap-1">
               <span>📷 ถ่าย: <strong class="font-semibold text-slate-700">${formatDate(item.shootDate)}</strong></span>
-              <span>🚀 ลง: <strong class="font-bold text-purple-700">${formatDate(item.publishDate)}</strong></span>
+              <span>🚀 ลง: <strong class="font-bold text-purple-700">${publishDisplay}</strong></span>
             </div>
           </div>
         `;
@@ -798,7 +830,7 @@
 
       for(let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr);
+        const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr).sort(sortByDateAndTime);
         const hasContent = dayContents.length > 0;
 
         let cardColorStyle = "bg-white border-slate-100 hover:border-purple-300";
@@ -823,6 +855,7 @@
 
         let itemsHtml = '';
         dayContents.forEach(c => {
+          const timeTag = formatTime(c.publishTime) ? `[${formatTime(c.publishTime)}] ` : '';
           (c.platforms || ['ทั่วไป']).forEach(plat => {
             let colorStyle = "bg-slate-100 text-slate-700 border-slate-300";
             if (plat === 'TikTok ช่องหลัก') colorStyle = "bg-emerald-100 text-emerald-800 border-emerald-300 font-semibold";
@@ -831,8 +864,8 @@
             if (plat === 'Instagram') colorStyle = "bg-purple-100 text-purple-800 border-purple-300 font-semibold";
 
             itemsHtml += `
-              <div class="text-[10px] ${colorStyle} border px-1.5 py-0.5 rounded-lg truncate mb-1" title="${c.topic} (${plat})">
-                ${c.topic}
+              <div class="text-[10px] ${colorStyle} border px-1.5 py-0.5 rounded-lg truncate mb-1" title="${timeTag}${c.topic} (${plat})">
+                ${timeTag}${c.topic}
               </div>
             `;
           });
@@ -869,7 +902,7 @@
           return d.getFullYear() === year && d.getMonth() === month && d.getDate() >= w.start && d.getDate() <= w.end;
         });
 
-        weekItems.sort((a, b) => new Date(a.publishDate) - new Date(b.publishDate));
+        weekItems.sort(sortByDateAndTime);
 
         const weekCard = document.createElement('div');
         weekCard.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex flex-col justify-between";
@@ -880,6 +913,7 @@
         } else {
           contentListHtml = weekItems.map(item => {
             const dateDay = new Date(item.publishDate).getDate();
+            const timeLabel = formatTime(item.publishTime) ? ` • ${formatTime(item.publishTime)} น.` : '';
             const platformTags = (item.platforms || []).map(p => {
               let dotColor = "bg-slate-400";
               if (p === 'TikTok ช่องหลัก') dotColor = "bg-emerald-500";
@@ -892,7 +926,7 @@
             return `
               <div class="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs text-xs space-y-1">
                 <div class="flex items-center justify-between font-semibold text-slate-700">
-                  <span class="text-purple-600 text-[11px]">วันที่ ${dateDay}</span>
+                  <span class="text-purple-600 text-[11px]">วันที่ ${dateDay}${timeLabel}</span>
                   <div>${platformTags}</div>
                 </div>
                 <div class="font-medium text-slate-800 truncate">${item.topic}</div>
@@ -916,7 +950,7 @@
 
     function handleDayClick(dateStr) {
       selectedDateForPick = dateStr;
-      const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr);
+      const dayContents = contents.filter(c => formatDate(c.publishDate) === dateStr).sort(sortByDateAndTime);
       openDayModal(dateStr, dayContents);
     }
 
@@ -951,11 +985,18 @@
         };
 
         dayContents.forEach(item => {
+          const timeBadge = formatTime(item.publishTime)
+            ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200"><i class="fa-regular fa-clock mr-1"></i>${formatTime(item.publishTime)} น.</span>`
+            : '';
+
           const itemEl = document.createElement('div');
           itemEl.className = "bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-2";
           itemEl.innerHTML = `
             <div class="flex justify-between items-start">
-              <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status}</span>
+              <div class="flex flex-wrap gap-1.5 items-center">
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeColors[item.status] || 'bg-slate-100'}">${item.status}</span>
+                ${timeBadge}
+              </div>
               <div class="flex space-x-1">
                 <button onclick="copyTopic(\`${(item.topic || '').replace(/`/g, '\\`')}\`)" title="คัดลอกหัวข้อ" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-regular fa-copy"></i></button>
                 <button onclick="closeDayModal(); editContent('${item.id}');" class="text-slate-400 hover:text-purple-600 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -1052,6 +1093,7 @@
       document.getElementById('topic').value = item.topic;
       document.getElementById('shootDate').value = formatDate(item.shootDate) !== '-' ? formatDate(item.shootDate) : '';
       document.getElementById('publishDate').value = formatDate(item.publishDate) !== '-' ? formatDate(item.publishDate) : '';
+      document.getElementById('publishTime').value = formatTime(item.publishTime);
       document.getElementById('status').value = item.status;
       document.getElementById('caption').value = item.caption || '';
 
@@ -1077,6 +1119,7 @@
       const topic = document.getElementById('topic').value;
       const shootDate = document.getElementById('shootDate').value;
       const publishDate = document.getElementById('publishDate').value;
+      const publishTime = document.getElementById('publishTime').value;
       const status = document.getElementById('status').value;
       const caption = document.getElementById('caption').value;
 
@@ -1085,7 +1128,7 @@
       if(id) {
         const index = contents.findIndex(c => String(c.id) === String(id));
         if(index !== -1) {
-          contents[index] = { id: String(id), topic, shootDate, publishDate, platforms, status, caption };
+          contents[index] = { id: String(id), topic, shootDate, publishDate, publishTime, platforms, status, caption };
         }
       } else {
         const newItem = {
@@ -1093,6 +1136,7 @@
           topic,
           shootDate,
           publishDate,
+          publishTime,
           platforms,
           status,
           caption
